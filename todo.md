@@ -1,5 +1,15 @@
 # Docu Web Feature TODO
 
+## Feature Example Live Run
+
+- [x] Add Live Run and Reset controls to every feature usage card.
+- [x] Add a sandboxed iframe output panel per example.
+- [x] Connect example code to the existing OneKit runtime runner through postMessage.
+- [x] Add runtime output, error, and timeout states per example.
+- [x] Verify feature routes, mobile layout, type-check/build, and example execution.
+- [x] Save a Live Run checkpoint.
+
+
 ## Feature Usage Code Documentation
 
 - [x] Map OneKit public exports to the relevant documentation routes.

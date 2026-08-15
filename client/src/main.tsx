@@ -131,7 +131,8 @@ sectionMarkup.api = `<section class="doc-section api-section" data-id="api"><div
 const usageCard = (label: string, importLine: string, code: string, note: string) => {
   const formatted = code.replace(/\\n/g, "\n");
   const copyValue = `${importLine}\n${formatted}`.replace(/"/g, "&quot;");
-  return `<div class="usage-card"><div class="usage-card-head"><span>${label}</span><button class="copy-inline" data-copy="${copyValue}">Copy</button></div><p>${note}</p><pre><code><span class="code-import">${importLine}</span>\n${formatted}</code></pre></div>`;
+  const runnerCode = encodeURIComponent(formatted);
+  return `<div class="usage-card"><div class="usage-card-head"><span>${label}</span><button class="copy-inline" data-copy="${copyValue}">Copy</button></div><p>${note}</p><pre><code><span class="code-import">${importLine}</span>\n${formatted}</code></pre><div class="example-runner"><div class="example-runner-bar"><span>LIVE EXAMPLE</span><span class="example-status" data-example-status>READY</span></div><div class="example-runner-actions"><button class="button button-dark example-run" data-example-code="${runnerCode}">Live Run ${icon("arrow")}</button><button class="text-button example-reset">Reset</button></div><iframe class="example-frame" title="${label} live example" sandbox="allow-scripts"></iframe></div></div>`;
 };
 
 sectionMarkup.reactive += `<div class="usage-lab"><div class="section-kicker"><span>USAGE</span><span>REACTIVE STATE</span></div>${usageCard("Reactive state", "import { reactive, effect } from \"onekit-js\";", "const state = reactive({ count: 0 });\\neffect(() => {\\n  document.querySelector(\"#count\").textContent = String(state.count);\\n});\\nstate.count += 1;", "Wrap plain data with reactive() and subscribe with effect(). Mutate the proxy directly; OneKit tracks the dependency and updates the DOM.")}${usageCard("Derived state", "import { reactive, computed } from \"onekit-js\";", "const cart = reactive({ total: 120, tax: 0.05 });\\nconst grandTotal = computed(() => cart.total * (1 + cart.tax));\\nconsole.log(grandTotal.value);", "Use computed() for a value derived from reactive state. Read the result through .value.")}</div></section>`;
@@ -156,6 +157,45 @@ const runtimeScript=document.createElement('script');runtimeScript.src='/manus-s
 function resetRunner(frame: HTMLIFrameElement) {
   frame.srcdoc = runnerSrcDoc;
   frame.dataset.ready = "true";
+}
+
+function bindUsageRunners() {
+  document.querySelectorAll<HTMLElement>(".usage-card").forEach((card) => {
+    const run = card.querySelector<HTMLButtonElement>(".example-run");
+    const reset = card.querySelector<HTMLButtonElement>(".example-reset");
+    const frame = card.querySelector<HTMLIFrameElement>(".example-frame");
+    const status = card.querySelector<HTMLElement>("[data-example-status]");
+    if (!run || !reset || !frame || !status || run.dataset.bound === "true") return;
+    run.dataset.bound = "true";
+    const execute = (code: string) => {
+      if (!frame.contentWindow) return;
+      status.textContent = "RUNNING";
+      frame.contentWindow.postMessage({ type: "run", code }, "*");
+    };
+    const resetFrame = () => {
+      frame.srcdoc = runnerSrcDoc;
+      frame.dataset.loaded = "false";
+      status.textContent = "READY";
+    };
+    window.addEventListener("message", (event) => {
+      if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
+      if (event.data.type === "ready") {
+        frame.dataset.loaded = "true";
+        const pending = frame.dataset.pendingCode;
+        if (pending) { delete frame.dataset.pendingCode; execute(pending); }
+      }
+      if (event.data.type === "complete" || event.data.type === "error") {
+        status.textContent = event.data.type === "error" ? "ERROR" : "COMPLETE";
+      }
+    });
+    run.addEventListener("click", () => {
+      const code = decodeURIComponent(run.dataset.exampleCode ?? "");
+      if (frame.dataset.loaded === "true") execute(code);
+      else { frame.dataset.pendingCode = code; resetFrame(); }
+    });
+    reset.addEventListener("click", resetFrame);
+    resetFrame();
+  });
 }
 
 function bindPlayground() {
@@ -291,6 +331,7 @@ effect(() => {
   renderToc();
   renderBreadcrumbs();
   bindPlayground();
+  bindUsageRunners();
 });
 
 effect(() => {
