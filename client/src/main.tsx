@@ -58,7 +58,7 @@ function renderShell() {
           <div class="sidebar-intro"><span class="eyebrow">The field guide</span><p>Build small, reactive interfaces with a runtime that stays out of your way.</p></div>
           <nav id="sidebar-nav"></nav>
           <div class="sidebar-foot"><span class="status-dot"></span><span>v3.1.13 · MIT licensed</span></div>
-        </aside>
+        </aside><button class="drawer-backdrop" aria-label="Close navigation" data-close-drawer></button>
         <main class="main-column">
           <section class="hero" id="overview">
             <div class="hero-copy"><span class="eyebrow">A practical guide to OneKit</span><h1>Build once.<br><em>Read it twice.</em></h1><p class="hero-lede">A compact, TypeScript-first reactive framework for browser applications. No ceremony. Just clear primitives that let your interface stay close to the DOM.</p><div class="hero-actions"><a class="button button-dark" href="#installation" data-section="installation">Start with the basics ${icon("arrow")}</a><a class="text-link" href="#reactive" data-section="reactive">Browse the API</a></div></div>
@@ -181,7 +181,20 @@ bindPlayground();
 
 document.querySelector("#doc-search")?.addEventListener("input", (event) => { state.query = (event.target as HTMLInputElement).value; });
 document.querySelector<HTMLSelectElement>("#version-select")?.addEventListener("change", (event) => { state.version = (event.target as HTMLSelectElement).value; });
-document.querySelector(".mobile-menu")?.addEventListener("click", () => { state.mobileOpen = !state.mobileOpen; });
+const mobileMenu = document.querySelector<HTMLButtonElement>(".mobile-menu");
+const sidebar = document.querySelector<HTMLElement>(".sidebar");
+const backdrop = document.querySelector<HTMLButtonElement>("[data-close-drawer]");
+const setDrawerOpen = (open: boolean) => {
+  state.mobileOpen = open;
+  sidebar?.classList.toggle("is-open", open);
+  backdrop?.classList.toggle("is-visible", open);
+  mobileMenu?.setAttribute("aria-expanded", String(open));
+  document.body.classList.toggle("drawer-open", open);
+};
+mobileMenu?.setAttribute("aria-expanded", "false");
+mobileMenu?.addEventListener("click", () => setDrawerOpen(!sidebar?.classList.contains("is-open")));
+backdrop?.addEventListener("click", () => setDrawerOpen(false));
+document.addEventListener("keydown", (event) => { if (event.key === "Escape") setDrawerOpen(false); });
 document.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); document.querySelector<HTMLInputElement>("#doc-search")?.focus(); } });
 document.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", () => { state.active = item.dataset.section ?? "overview"; }));
 
@@ -200,6 +213,8 @@ effect(() => {
   const description = document.querySelector<HTMLElement>("[data-version-description]");
   if (description) description.textContent = versions[version as keyof typeof versions];
   document.querySelector(".version-control select")?.setAttribute("value", version);
-  document.querySelector(".sidebar")?.classList.toggle("is-open", state.mobileOpen);
+      document.querySelector(".sidebar")?.classList.toggle("is-open", state.mobileOpen);
+      document.querySelector("[data-close-drawer]")?.classList.toggle("is-visible", state.mobileOpen);
+      document.body.classList.toggle("drawer-open", state.mobileOpen);
   document.querySelectorAll<HTMLElement>("[data-copy] span").forEach((label) => { if (state.copied) label.textContent = "Copied"; });
 });

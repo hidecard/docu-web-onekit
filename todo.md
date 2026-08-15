@@ -1,5 +1,13 @@
 # Docu Web Feature TODO
 
+## Mobile Navigation Bug Fix
+
+- [x] Reproduce the mobile menu toggle issue and inspect drawer event binding.
+- [x] Fix menu toggle, drawer close, and navigation link behavior.
+- [x] Verify mobile and desktop preview plus type-check/build.
+- [x] Save a bug-fix checkpoint.
+
+
 ## Git Sync Update
 
 - [x] Inspect current branch, remote, and working tree before pulling.
