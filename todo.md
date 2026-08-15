@@ -1,5 +1,14 @@
 # Docu Web Feature TODO
 
+## Git Sync Update
+
+- [x] Inspect current branch, remote, and working tree before pulling.
+- [x] Pull remote changes without losing Docu Web OneKit playground updates.
+- [x] Reapply sandboxed iframe playground changes if remote files overwrite them.
+- [x] Resolve conflicts and run type-check/build after sync.
+- [x] Verify the updated preview and save a new checkpoint.
+
+
 - [ ] Add OneKit API reference catalog with version-aware examples.
 - [ ] Add Version Selector UI for v3.1.13, v3.1.x, and Legacy v2.
 - [x] Add Live Code Playground with editable OneKit code, Run action, Reset action, and output panel.
