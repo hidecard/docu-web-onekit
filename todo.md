@@ -1,5 +1,16 @@
 # Docu Web Feature TODO
 
+## Learner Usage Hub Expansion
+
+- [x] Add learner journey sections from first app to production.
+- [x] Add complete OneKit feature catalog covering core, UI, data, routing, SSR, tooling, and browser utilities.
+- [x] Add API usage cards with short explanations, signatures, and runnable examples.
+- [x] Add learning level labels and progress cues.
+- [x] Add search/filter support for learner topics and features.
+- [x] Verify the learner flow on desktop/mobile and run type-check/build.
+- [x] Save a learner documentation checkpoint.
+
+
 ## Mobile Navigation Bug Fix
 
 - [x] Reproduce the mobile menu toggle issue and inspect drawer event binding.
