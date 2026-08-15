@@ -1,5 +1,15 @@
 # Docu Web Feature TODO
 
+## Route Titles and Breadcrumbs
+
+- [x] Define route metadata for every OneKit documentation route.
+- [x] Add route-driven document titles and meta descriptions.
+- [x] Add breadcrumb navigation to the documentation shell.
+- [x] Sync title and breadcrumb state through OneKit router subscription.
+- [x] Verify route transitions, responsive layout, type-check/build.
+- [x] Save a route metadata checkpoint.
+
+
 ## OneKit Router Migration
 
 - [x] Inspect the OneKit router API and current manual navigation flow.

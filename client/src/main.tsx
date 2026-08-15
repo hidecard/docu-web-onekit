@@ -34,16 +34,29 @@ const versions = {
   "2.x": "Legacy reference",
 };
 
+const routeMeta: Record<string, { title: string; description: string; group: string }> = {
+  overview: { title: "Overview", description: "A practical introduction to the OneKit browser runtime.", group: "Start here" },
+  installation: { title: "Installation", description: "Install OneKit and create your first project.", group: "Start here" },
+  reactive: { title: "Reactive state", description: "Build predictable interfaces with reactive primitives.", group: "Core concepts" },
+  components: { title: "Components", description: "Compose reusable UI with OneKit components and scopes.", group: "Core concepts" },
+  routing: { title: "Routing", description: "Navigate browser applications with the OneKit router.", group: "Core concepts" },
+  production: { title: "Production", description: "Type-check, test, build, and ship a OneKit application.", group: "Ship it" },
+  journey: { title: "Learner path", description: "A guided path from your first OneKit app to production.", group: "Learn OneKit" },
+  features: { title: "All features", description: "A complete learner map of OneKit capabilities.", group: "Learn OneKit" },
+  api: { title: "API reference", description: "Read and run OneKit API primitives in the browser.", group: "Reference" },
+};
+
 const sectionPath = (id: string) => id === "overview" ? "/" : `/docs/${id}`;
 const pathSection = (path: string) => path === "/" ? "overview" : path.replace("/docs/", "");
 const appRouter = createRouter(
-  sections.map((section) => ({ path: sectionPath(section.id), handler: () => { state.active = section.id; } })),
+  sections.map((section) => ({ path: sectionPath(section.id), handler: () => { state.active = section.id; applyRouteMeta(section.id); } })),
   { mode: "history" },
 );
 const routerStart = appRouter.start();
 appRouter.subscribe((to) => {
   const id = pathSection(to.fullPath);
   state.active = id;
+  applyRouteMeta(id);
   requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }));
 });
 
@@ -80,7 +93,7 @@ function renderShell() {
             <div class="hero-art"><img src="/manus-storage/docu-web-hero_7be2b1e9.png" alt="Abstract editorial illustration of a technical guide" /><div class="art-caption"><span>FIG. 01</span><span>OneKit / browser runtime</span></div></div>
           </section>
           <div class="reading-layout"><article class="document" id="document-content">
-            <div class="document-meta"><span>DOCUMENTATION / V3</span><span>8 MIN READ</span><span>UPDATED AUG 15, 2026</span></div>
+            <div id="breadcrumbs" class="breadcrumbs" aria-label="Breadcrumb"></div><div class="document-meta"><span>DOCUMENTATION / V3</span><span>8 MIN READ</span><span>UPDATED AUG 15, 2026</span></div>
             <div class="search-row"><div class="search-box">${icon("search")}<input id="doc-search" type="search" placeholder="Search the field guide…" aria-label="Search documentation" /><kbd>⌘ K</kbd></div><span id="search-count" class="search-count"></span></div>
             <div id="doc-sections"></div>
           </article><aside class="toc" aria-label="On this page"><span class="eyebrow">On this page</span><div id="toc-links"></div><div class="toc-note"><span class="red-rule"></span><p>Keep the surface small. Let the state do the work.</p></div></aside></div>
@@ -166,6 +179,21 @@ function bindPlayground() {
   }));
 }
 
+function applyRouteMeta(id: string) {
+  const meta = routeMeta[id] ?? routeMeta.overview;
+  document.title = `${meta.title} · Docu Web`;
+  let description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+  if (!description) { description = document.createElement("meta"); description.name = "description"; document.head.appendChild(description); }
+  description.content = meta.description;
+}
+
+function renderBreadcrumbs() {
+  const target = document.querySelector<HTMLElement>("#breadcrumbs");
+  if (!target) return;
+  const meta = routeMeta[state.active] ?? routeMeta.overview;
+  target.innerHTML = `<a href="/" data-section="overview">Docu Web</a><span>/</span><span>${meta.group}</span><span>/</span><strong>${meta.title}</strong>`;
+}
+
 async function navigateToSection(id: string) {
   state.mobileOpen = false;
   await routerStart;
@@ -203,6 +231,7 @@ renderShell();
 renderNavigation();
 renderDocument();
 renderToc();
+renderBreadcrumbs();
 bindPlayground();
 
 document.querySelector("#doc-search")?.addEventListener("input", (event) => { state.query = (event.target as HTMLInputElement).value; });
@@ -235,6 +264,7 @@ effect(() => {
   renderDocument();
   renderNavigation();
   renderToc();
+  renderBreadcrumbs();
   bindPlayground();
 });
 
