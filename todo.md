@@ -1,5 +1,22 @@
 # Docu Web Feature TODO
 
+## GitHub Publish
+
+- [ ] Inspect local Git state and confirm repository availability.
+- [ ] Create or connect the private `docu-web-onekit` GitHub repository.
+- [ ] Commit and push the Docu Web source code.
+- [ ] Verify the remote URL, branch, and pushed commit.
+
+
+## Reusable Skill Creation
+
+- [x] Define skill trigger, scope, workflow phases, and non-obvious guardrails.
+- [x] Initialize a new skill directory with the official skill creator script.
+- [x] Write concise SKILL.md and add references only where progressive disclosure helps.
+- [x] Remove unused template files and validate the skill package.
+- [x] Deliver the reusable SKILL.md to the user.
+
+
 ## Feature Example Live Run
 
 - [x] Add Live Run and Reset controls to every feature usage card.
