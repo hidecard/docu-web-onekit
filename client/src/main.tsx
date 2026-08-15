@@ -3,7 +3,7 @@
  * OneKit-only runtime: reactive state + effects drive search, active navigation,
  * copy feedback, and mobile drawer behavior. React is not used by this entrypoint.
  */
-import { reactive, effect } from "onekit-js";
+import { reactive, effect, createRouter } from "onekit-js";
 import "./index.css";
 
 const state = reactive({
@@ -34,6 +34,19 @@ const versions = {
   "2.x": "Legacy reference",
 };
 
+const sectionPath = (id: string) => id === "overview" ? "/" : `/docs/${id}`;
+const pathSection = (path: string) => path === "/" ? "overview" : path.replace("/docs/", "");
+const appRouter = createRouter(
+  sections.map((section) => ({ path: sectionPath(section.id), handler: () => { state.active = section.id; } })),
+  { mode: "history" },
+);
+const routerStart = appRouter.start();
+appRouter.subscribe((to) => {
+  const id = pathSection(to.fullPath);
+  state.active = id;
+  requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+});
+
 const icon = (name: string) => {
   const paths: Record<string, string> = {
     search: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
@@ -52,7 +65,7 @@ function renderShell() {
   document.body.innerHTML = `
     <div class="site-frame">
       <header class="topbar">
-        <a class="wordmark" href="#overview" data-section="overview">${logo}<span>docu<span class="wordmark-accent">web</span></span></a>
+        <a class="wordmark" href="/" data-section="overview">${logo}<span>docu<span class="wordmark-accent">web</span></span></a>
         <div class="topbar-meta"><label class="version-control"><span>VERSION</span><select id="version-select" aria-label="Documentation version">${Object.entries(versions).map(([value, label]) => `<option value="${value}" ${state.version === value ? "selected" : ""}>${value} · ${label.split(" · ")[0]}</option>`).join("")}</select></label><span class="version-pill">ONEKIT JS · V3</span><a href="https://github.com/hidecard/onekit-js" target="_blank" rel="noreferrer">GitHub ${icon("external")}</a><button class="mobile-menu" aria-label="Open navigation">${icon("menu")}</button></div>
       </header>
       <div class="content-frame">
@@ -63,7 +76,7 @@ function renderShell() {
         </aside><button class="drawer-backdrop" aria-label="Close navigation" data-close-drawer></button>
         <main class="main-column">
           <section class="hero" id="overview">
-            <div class="hero-copy"><span class="eyebrow">A practical guide to OneKit</span><h1>Build once.<br><em>Read it twice.</em></h1><p class="hero-lede">A compact, TypeScript-first reactive framework for browser applications. No ceremony. Just clear primitives that let your interface stay close to the DOM.</p><div class="hero-actions"><a class="button button-dark" href="#journey" data-section="journey">Start the learner path ${icon("arrow")}</a><a class="text-link" href="#features" data-section="features">See all features</a></div><div class="learning-stamp"><span class="stamp-check">✓</span><span><strong>Learning route</strong><small>Beginner → builder → production</small></span></div></div>
+            <div class="hero-copy"><span class="eyebrow">A practical guide to OneKit</span><h1>Build once.<br><em>Read it twice.</em></h1><p class="hero-lede">A compact, TypeScript-first reactive framework for browser applications. No ceremony. Just clear primitives that let your interface stay close to the DOM.</p><div class="hero-actions"><a class="button button-dark" href="/docs/journey" data-section="journey">Start the learner path ${icon("arrow")}</a><a class="text-link" href="/docs/features" data-section="features">See all features</a></div><div class="learning-stamp"><span class="stamp-check">✓</span><span><strong>Learning route</strong><small>Beginner → builder → production</small></span></div></div>
             <div class="hero-art"><img src="/manus-storage/docu-web-hero_7be2b1e9.png" alt="Abstract editorial illustration of a technical guide" /><div class="art-caption"><span>FIG. 01</span><span>OneKit / browser runtime</span></div></div>
           </section>
           <div class="reading-layout"><article class="document" id="document-content">
@@ -96,7 +109,7 @@ state.count += <span class="num">1</span>;</code></pre></div></section>`,
   production: `<section class="doc-section" data-id="production"><div class="section-kicker"><span>06</span><span>SHIP IT</span></div><h2>Production checklist</h2><p>Before publishing, run the same checks that protect the package: type-checking, tests, a clean build, and package verification.</p><div class="checklist"><div><span>01</span><strong>Type-check</strong><code>npm run type-check</code></div><div><span>02</span><strong>Test</strong><code>npm test -- --runInBand</code></div><div><span>03</span><strong>Build</strong><code>npm run build</code></div></div></section>`,
 };
 
-sectionMarkup.journey = `<section class="doc-section learner-section" data-id="journey"><div class="section-kicker"><span>07</span><span>LEARN ONEKIT</span></div><div class="learner-heading"><div><h2>Learn by building the surface.</h2><p>Follow the path in order or jump to the feature you need. Every stop pairs a plain-language explanation with a small, runnable example.</p></div><span class="level-badge">6 stages</span></div><div class="journey-grid"><a href="#installation" data-section="installation"><span>01</span><strong>First app</strong><small>Install, mount, and make the browser respond.</small></a><a href="#reactive" data-section="reactive"><span>02</span><strong>State</strong><small>Reactive, computed, watched, and batched.</small></a><a href="#components" data-section="components"><span>03</span><strong>UI systems</strong><small>Components, templates, JSX, and VDOM.</small></a><a href="#routing" data-section="routing"><span>04</span><strong>Navigation</strong><small>Routes, stores, plugins, and scopes.</small></a><a href="#features" data-section="features"><span>05</span><strong>Browser tools</strong><small>HTTP, storage, a11y, security, and Web Components.</small></a><a href="#production" data-section="production"><span>06</span><strong>Ship it</strong><small>SSR, hydration, Vite, CLI, tests, and release checks.</small></a></div></section>`;
+sectionMarkup.journey = `<section class="doc-section learner-section" data-id="journey"><div class="section-kicker"><span>07</span><span>LEARN ONEKIT</span></div><div class="learner-heading"><div><h2>Learn by building the surface.</h2><p>Follow the path in order or jump to the feature you need. Every stop pairs a plain-language explanation with a small, runnable example.</p></div><span class="level-badge">6 stages</span></div><div class="journey-grid"><a href="/docs/installation" data-section="installation"><span>01</span><strong>First app</strong><small>Install, mount, and make the browser respond.</small></a><a href="/docs/reactive" data-section="reactive"><span>02</span><strong>State</strong><small>Reactive, computed, watched, and batched.</small></a><a href="/docs/components" data-section="components"><span>03</span><strong>UI systems</strong><small>Components, templates, JSX, and VDOM.</small></a><a href="/docs/routing" data-section="routing"><span>04</span><strong>Navigation</strong><small>Routes, stores, plugins, and scopes.</small></a><a href="/docs/features" data-section="features"><span>05</span><strong>Browser tools</strong><small>HTTP, storage, a11y, security, and Web Components.</small></a><a href="/docs/production" data-section="production"><span>06</span><strong>Ship it</strong><small>SSR, hydration, Vite, CLI, tests, and release checks.</small></a></div></section>`;
 
 sectionMarkup.features = `<section class="doc-section learner-section" data-id="features"><div class="section-kicker"><span>08</span><span>LEARN ONEKIT</span></div><div class="learner-heading"><div><h2>OneKit, mapped for learners.</h2><p>Use this catalog as your map. Start with the core, then add the browser and production modules when your app asks for them.</p></div><span class="level-badge">18 areas</span></div><div class="feature-catalog"><div class="feature-cluster"><div class="cluster-head"><span>CORE RUNTIME</span><small>Start here</small></div><div class="feature-row"><code>reactive · computed · effect · watch</code><span>State and dependency tracking</span></div><div class="feature-row"><code>defineComponent · mount · scope</code><span>Components and lifecycle</span></div><div class="feature-row"><code>template · directives · expressions</code><span>Declarative DOM views</span></div><div class="feature-row"><code>h · jsx · render · patch</code><span>JSX, VDOM, and render helpers</span></div></div><div class="feature-cluster"><div class="cluster-head"><span>APP ARCHITECTURE</span><small>Build structure</small></div><div class="feature-row"><code>router · history · hash · memory</code><span>Navigation and route state</span></div><div class="feature-row"><code>store · plugins · DI</code><span>Shared state and composition</span></div><div class="feature-row"><code>scope · errors · loading</code><span>Teardown and boundaries</span></div><div class="feature-row"><code>SSR · hydration</code><span>Server output and client takeover</span></div></div><div class="feature-cluster"><div class="cluster-head"><span>BROWSER + SHIP</span><small>Go further</small></div><div class="feature-row"><code>request · get · post · API</code><span>HTTP helpers</span></div><div class="feature-row"><code>storage · cache · snapshot</code><span>Browser storage and utilities</span></div><div class="feature-row"><code>a11y · security · sanitize</code><span>Accessible, safer interfaces</span></div><div class="feature-row"><code>animation · Web Components · DevTools</code><span>Polish and integration</span></div><div class="feature-row"><code>Vite plugin · CLI · testing</code><span>Developer workflow</span></div></div></div></section>`;
 
@@ -153,10 +166,10 @@ function bindPlayground() {
   }));
 }
 
-function navigateToSection(id: string) {
-  state.active = id;
+async function navigateToSection(id: string) {
   state.mobileOpen = false;
-  history.replaceState(null, "", `#${id}`);
+  await routerStart;
+  await appRouter.navigate(sectionPath(id));
   requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }));
 }
 
@@ -164,8 +177,8 @@ function renderNavigation() {
   const grouped = sections.reduce<Record<string, typeof sections>>((acc, item) => { (acc[item.group] ??= []).push(item); return acc; }, {});
   const nav = document.querySelector("#sidebar-nav");
   if (!nav) return;
-  nav.innerHTML = Object.entries(grouped).map(([group, items]) => `<div class="nav-group"><span class="nav-group-label">${group}</span>${items.map((item) => `<a class="nav-item ${state.active === item.id ? "is-active" : ""}" href="#${item.id}" data-section="${item.id}"><span>${item.number}</span>${item.label}</a>`).join("")}</div>`).join("");
-  nav.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", (event) => { event.preventDefault(); navigateToSection(item.dataset.section ?? "overview"); }));
+  nav.innerHTML = Object.entries(grouped).map(([group, items]) => `<div class="nav-group"><span class="nav-group-label">${group}</span>${items.map((item) => `<a class="nav-item ${state.active === item.id ? "is-active" : ""}" href="${sectionPath(item.id)}" data-section="${item.id}"><span>${item.number}</span>${item.label}</a>`).join("")}</div>`).join("");
+
 }
 
 function renderDocument() {
@@ -182,8 +195,8 @@ function renderDocument() {
 function renderToc() {
   const toc = document.querySelector("#toc-links");
   if (!toc) return;
-  toc.innerHTML = sections.map((item) => `<a class="toc-link ${state.active === item.id ? "is-active" : ""}" href="#${item.id}" data-section="${item.id}">${item.label}</a>`).join("");
-  toc.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", (event) => { event.preventDefault(); navigateToSection(item.dataset.section ?? "overview"); }));
+  toc.innerHTML = sections.map((item) => `<a class="toc-link ${state.active === item.id ? "is-active" : ""}" href="${sectionPath(item.id)}" data-section="${item.id}">${item.label}</a>`).join("");
+
 }
 
 renderShell();
@@ -209,7 +222,12 @@ mobileMenu?.addEventListener("click", () => setDrawerOpen(!sidebar?.classList.co
 backdrop?.addEventListener("click", () => setDrawerOpen(false));
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") setDrawerOpen(false); });
 document.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); document.querySelector<HTMLInputElement>("#doc-search")?.focus(); } });
-document.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", (event) => { event.preventDefault(); navigateToSection(item.dataset.section ?? "overview"); }));
+document.addEventListener("click", (event) => {
+  const link = (event.target as HTMLElement).closest<HTMLElement>("[data-section]");
+  if (!link) return;
+  event.preventDefault();
+  void navigateToSection(link.dataset.section ?? "overview");
+});
 
 effect(() => {
   const query = state.query;

@@ -1,5 +1,15 @@
 # Docu Web Feature TODO
 
+## OneKit Router Migration
+
+- [x] Inspect the OneKit router API and current manual navigation flow.
+- [x] Add a OneKit router instance with documentation route records.
+- [x] Wire sidebar, TOC, learner links, and API links through OneKit router navigation.
+- [x] Support browser back/forward and route-driven active section state.
+- [x] Verify mobile drawer routing, type-check/build, and responsive preview.
+- [x] Save a OneKit router checkpoint.
+
+
 ## Slide Navigation Link Fix
 
 - [x] Reproduce why mobile drawer menu items do not navigate.
