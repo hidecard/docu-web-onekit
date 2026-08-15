@@ -1,5 +1,14 @@
 # Docu Web Feature TODO
 
+## Slide Navigation Link Fix
+
+- [x] Reproduce why mobile drawer menu items do not navigate.
+- [x] Add reliable event delegation and anchor scrolling for drawer links.
+- [x] Close the drawer after navigation and preserve active section state.
+- [x] Verify mobile/desktop navigation and run type-check/build.
+- [x] Save a navigation bug-fix checkpoint.
+
+
 ## Learner Usage Hub Expansion
 
 - [x] Add learner journey sections from first app to production.

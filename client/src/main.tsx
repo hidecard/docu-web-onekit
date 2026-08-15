@@ -153,12 +153,19 @@ function bindPlayground() {
   }));
 }
 
+function navigateToSection(id: string) {
+  state.active = id;
+  state.mobileOpen = false;
+  history.replaceState(null, "", `#${id}`);
+  requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+}
+
 function renderNavigation() {
   const grouped = sections.reduce<Record<string, typeof sections>>((acc, item) => { (acc[item.group] ??= []).push(item); return acc; }, {});
   const nav = document.querySelector("#sidebar-nav");
   if (!nav) return;
   nav.innerHTML = Object.entries(grouped).map(([group, items]) => `<div class="nav-group"><span class="nav-group-label">${group}</span>${items.map((item) => `<a class="nav-item ${state.active === item.id ? "is-active" : ""}" href="#${item.id}" data-section="${item.id}"><span>${item.number}</span>${item.label}</a>`).join("")}</div>`).join("");
-  nav.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", () => { state.active = item.dataset.section ?? "overview"; state.mobileOpen = false; }));
+  nav.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", (event) => { event.preventDefault(); navigateToSection(item.dataset.section ?? "overview"); }));
 }
 
 function renderDocument() {
@@ -176,7 +183,7 @@ function renderToc() {
   const toc = document.querySelector("#toc-links");
   if (!toc) return;
   toc.innerHTML = sections.map((item) => `<a class="toc-link ${state.active === item.id ? "is-active" : ""}" href="#${item.id}" data-section="${item.id}">${item.label}</a>`).join("");
-  toc.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", () => { state.active = item.dataset.section ?? "overview"; }));
+  toc.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", (event) => { event.preventDefault(); navigateToSection(item.dataset.section ?? "overview"); }));
 }
 
 renderShell();
@@ -202,7 +209,7 @@ mobileMenu?.addEventListener("click", () => setDrawerOpen(!sidebar?.classList.co
 backdrop?.addEventListener("click", () => setDrawerOpen(false));
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") setDrawerOpen(false); });
 document.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); document.querySelector<HTMLInputElement>("#doc-search")?.focus(); } });
-document.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", () => { state.active = item.dataset.section ?? "overview"; }));
+document.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", (event) => { event.preventDefault(); navigateToSection(item.dataset.section ?? "overview"); }));
 
 effect(() => {
   const query = state.query;
