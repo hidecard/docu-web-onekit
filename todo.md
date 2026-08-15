@@ -1,5 +1,15 @@
 # Docu Web Feature TODO
 
+## Route-based Documentation Pages
+
+- [x] Model route-specific documentation page content and navigation metadata.
+- [x] Render only the active route's documentation page instead of all sections at once.
+- [x] Connect OneKit router transitions to page content, title, breadcrumb, and active nav.
+- [x] Add route-aware previous/next documentation links and 404 fallback.
+- [x] Verify representative routes, mobile drawer, type-check/build, and responsive preview.
+- [x] Save a route-based docs checkpoint.
+
+
 ## Route Titles and Breadcrumbs
 
 - [x] Define route metadata for every OneKit documentation route.

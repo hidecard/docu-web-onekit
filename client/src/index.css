@@ -142,3 +142,8 @@ pre { margin:0; padding:22px 20px 25px; overflow:auto; font:13px/1.8 'IBM Plex M
 .breadcrumbs a:hover { border-color:var(--vermilion); }
 .breadcrumbs strong { color:var(--ink); font-weight:500; }
 @media (max-width:680px) { .breadcrumbs { margin-bottom:13px; font-size:9px; gap:6px; overflow:hidden; white-space:nowrap; } }
+
+/* Route pages: only the active document is visible, with a clear learning handoff between routes. */
+.hero.route-hidden { display:none; }
+.route-pager { display:flex; justify-content:space-between; gap:24px; margin-top:46px; padding-top:18px; border-top:1px solid var(--line); }.route-pager > span:last-child { text-align:right; }.route-pager a { display:flex; flex-direction:column; gap:6px; color:var(--ink); text-decoration:none; }.route-pager a:hover strong { color:var(--vermilion); }.route-pager small,.toc-route-note { color:#9a978e; font:10px 'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.08em; }.route-pager strong { font-size:14px; font-weight:500; transition:color .18s var(--ease); }.toc-route-note { display:block; margin-top:12px; color:#aaa69d; font-size:9px; }
+@media (max-width:680px) { .route-pager { margin-top:34px; gap:12px; }.route-pager strong { font-size:12px; }.route-pager small { font-size:9px; } }

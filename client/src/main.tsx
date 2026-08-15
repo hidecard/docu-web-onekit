@@ -196,6 +196,7 @@ function renderBreadcrumbs() {
 
 async function navigateToSection(id: string) {
   state.mobileOpen = false;
+  state.query = "";
   await routerStart;
   await appRouter.navigate(sectionPath(id));
   requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -214,8 +215,16 @@ function renderDocument() {
   const count = document.querySelector("#search-count");
   if (!target || !count) return;
   const query = state.query.trim().toLowerCase();
-  const visible = sections.filter((section) => !query || section.label.toLowerCase().includes(query) || sectionMarkup[section.id].toLowerCase().includes(query));
-  target.innerHTML = visible.length ? visible.map((section) => sectionMarkup[section.id]).join("") : `<div class="empty-state"><span>NO MATCHES</span><h3>Nothing in the field guide yet.</h3><p>Try “reactive”, “routing”, or “install”.</p></div>`;
+  const currentIndex = sections.findIndex((section) => section.id === state.active);
+  const current = sections[currentIndex];
+  const visible = query
+    ? sections.filter((section) => section.label.toLowerCase().includes(query) || sectionMarkup[section.id].toLowerCase().includes(query))
+    : current ? [current] : [];
+  const previous = currentIndex > 0 ? sections[currentIndex - 1] : undefined;
+  const next = currentIndex >= 0 && currentIndex < sections.length - 1 ? sections[currentIndex + 1] : undefined;
+  const pager = !query && current ? `<nav class="route-pager" aria-label="Documentation pagination"><span>${previous ? `<a href="${sectionPath(previous.id)}" data-section="${previous.id}"><small>Previous</small><strong>← ${previous.label}</strong></a>` : ""}</span><span>${next ? `<a href="${sectionPath(next.id)}" data-section="${next.id}"><small>Next</small><strong>${next.label} →</strong></a>` : ""}</span></nav>` : "";
+  document.querySelector(".hero")?.classList.toggle("route-hidden", !query && state.active !== "overview");
+  target.innerHTML = visible.length ? `${visible.map((section) => sectionMarkup[section.id]).join("")}${pager}` : `<div class="empty-state"><span>NO MATCHES</span><h3>Nothing in the field guide yet.</h3><p>Try “reactive”, “routing”, or “install”.</p></div>`;
   count.textContent = query ? `${visible.length} result${visible.length === 1 ? "" : "s"}` : "";
   target.querySelectorAll<HTMLElement>("[data-copy]").forEach((button) => button.addEventListener("click", async () => { await navigator.clipboard?.writeText(button.dataset.copy ?? ""); state.copied = true; setTimeout(() => state.copied = false, 1400); }));
 }
@@ -223,8 +232,8 @@ function renderDocument() {
 function renderToc() {
   const toc = document.querySelector("#toc-links");
   if (!toc) return;
-  toc.innerHTML = sections.map((item) => `<a class="toc-link ${state.active === item.id ? "is-active" : ""}" href="${sectionPath(item.id)}" data-section="${item.id}">${item.label}</a>`).join("");
-
+  const current = routeMeta[state.active] ?? routeMeta.overview;
+  toc.innerHTML = `<a class="toc-link is-active" href="${sectionPath(state.active)}" data-section="${state.active}">${current.title}</a><span class="toc-route-note">Current route</span>`;
 }
 
 renderShell();
