@@ -1,5 +1,15 @@
 # Docu Web Feature TODO
 
+## Feature Usage Code Documentation
+
+- [x] Map OneKit public exports to the relevant documentation routes.
+- [x] Add imports, signatures, framework-specific usage notes, and code examples per feature.
+- [x] Add copyable code blocks and runnable examples where supported.
+- [x] Connect feature examples to route pages and maintain learner-friendly explanations.
+- [x] Verify representative feature routes, responsive layout, type-check/build.
+- [x] Save a feature usage documentation checkpoint.
+
+
 ## Route-based Documentation Pages
 
 - [x] Model route-specific documentation page content and navigation metadata.
