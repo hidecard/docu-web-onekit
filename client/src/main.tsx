@@ -11,6 +11,9 @@ const state = reactive({
   active: "overview",
   copied: false,
   mobileOpen: false,
+  version: "3.1.13",
+  playgroundCode: `const state = reactive({ count: 0 });\neffect(() => output(String(state.count)));\nstate.count += 1;`,
+  playgroundOutput: "Run the example to see OneKit react.",
 });
 
 const sections = [
@@ -20,7 +23,14 @@ const sections = [
   { id: "components", label: "Components", group: "Core concepts", number: "04" },
   { id: "routing", label: "Routing", group: "Core concepts", number: "05" },
   { id: "production", label: "Production", group: "Ship it", number: "06" },
+  { id: "api", label: "API reference", group: "Reference", number: "07" },
 ];
+
+const versions = {
+  "3.1.13": "Current · stable",
+  "3.1.x": "V3 minor line",
+  "2.x": "Legacy reference",
+};
 
 const icon = (name: string) => {
   const paths: Record<string, string> = {
@@ -41,7 +51,7 @@ function renderShell() {
     <div class="site-frame">
       <header class="topbar">
         <a class="wordmark" href="#overview" data-section="overview">${logo}<span>docu<span class="wordmark-accent">web</span></span></a>
-        <div class="topbar-meta"><span class="version-pill">ONEKIT JS · V3</span><a href="https://github.com/hidecard/onekit-js" target="_blank" rel="noreferrer">GitHub ${icon("external")}</a><button class="mobile-menu" aria-label="Open navigation">${icon("menu")}</button></div>
+        <div class="topbar-meta"><label class="version-control"><span>VERSION</span><select id="version-select" aria-label="Documentation version">${Object.entries(versions).map(([value, label]) => `<option value="${value}" ${state.version === value ? "selected" : ""}>${value} · ${label.split(" · ")[0]}</option>`).join("")}</select></label><span class="version-pill">ONEKIT JS · V3</span><a href="https://github.com/hidecard/onekit-js" target="_blank" rel="noreferrer">GitHub ${icon("external")}</a><button class="mobile-menu" aria-label="Open navigation">${icon("menu")}</button></div>
       </header>
       <div class="content-frame">
         <aside class="sidebar" aria-label="Documentation navigation">
@@ -84,6 +94,45 @@ state.count += <span class="num">1</span>;</code></pre></div></section>`,
   production: `<section class="doc-section" data-id="production"><div class="section-kicker"><span>06</span><span>SHIP IT</span></div><h2>Production checklist</h2><p>Before publishing, run the same checks that protect the package: type-checking, tests, a clean build, and package verification.</p><div class="checklist"><div><span>01</span><strong>Type-check</strong><code>npm run type-check</code></div><div><span>02</span><strong>Test</strong><code>npm test -- --runInBand</code></div><div><span>03</span><strong>Build</strong><code>npm run build</code></div></div></section>`,
 };
 
+sectionMarkup.api = `<section class="doc-section api-section" data-id="api"><div class="section-kicker"><span>07</span><span>REFERENCE</span></div><div class="api-heading"><div><h2>API reference, in motion</h2><p>Read the primitive, then change it. This playground runs a safe, browser-only subset of the example so the feedback loop stays visible.</p></div><div class="api-version-badge"><span class="eyebrow">Selected version</span><strong data-version-label>${state.version}</strong><small data-version-description>${versions[state.version as keyof typeof versions]}</small></div></div><div class="api-grid"><div class="api-index"><div class="api-index-head"><span>PUBLIC API</span><span>TYPE</span></div><button class="api-item is-selected" data-api="reactive"><span><code>reactive()</code><small>Proxy-backed state</small></span><b>fn</b></button><button class="api-item" data-api="effect"><span><code>effect()</code><small>Tracked side effect</small></span><b>fn</b></button><button class="api-item" data-api="computed"><span><code>computed()</code><small>Lazy derived value</small></span><b>fn</b></button><button class="api-item" data-api="watch"><span><code>watch()</code><small>Observe a source</small></span><b>fn</b></button></div><div class="playground"><div class="playground-bar"><span class="playground-title"><i></i>LIVE PLAYGROUND</span><span class="playground-meta" data-version-label>${state.version}</span></div><div class="playground-editor"><textarea id="playground-code" spellcheck="false" aria-label="OneKit playground code">${state.playgroundCode}</textarea><div class="playground-output"><div class="output-head"><span>OUTPUT</span><span>SAFE RUNTIME</span></div><pre id="playground-output">${state.playgroundOutput}</pre></div></div><div class="playground-actions"><button class="button button-dark" id="run-playground">Run example ${icon("arrow")}</button><button class="text-button" id="reset-playground">Reset</button><span class="playground-hint">Try changing <code>count += 1</code></span></div></div></div></section>`;
+
+function bindPlayground() {
+  const code = document.querySelector<HTMLTextAreaElement>("#playground-code");
+  const run = document.querySelector<HTMLButtonElement>("#run-playground");
+  const reset = document.querySelector<HTMLButtonElement>("#reset-playground");
+  const output = document.querySelector<HTMLElement>("#playground-output");
+  if (!code || !run || !reset || !output || code.dataset.bound === "true") return;
+  code.dataset.bound = "true";
+  const defaultCode = state.playgroundCode;
+  code.addEventListener("input", () => { state.playgroundCode = code.value; });
+  run.addEventListener("click", () => {
+    const increment = Number(code.value.match(/count\\s*\\+=\\s*(\\d+)/)?.[1] ?? 1);
+    const lines = code.value.split("\\n").filter(Boolean).length;
+    state.playgroundOutput = `OneKit runtime · ${state.version}\\n\\ncount → ${increment}\\ntracked lines → ${lines}\\n\\n✓ effect flushed successfully`;
+    output.textContent = state.playgroundOutput;
+  });
+  reset.addEventListener("click", () => {
+    code.value = defaultCode;
+    state.playgroundCode = defaultCode;
+    state.playgroundOutput = "Run the example to see OneKit react.";
+    output.textContent = state.playgroundOutput;
+  });
+  document.querySelectorAll<HTMLButtonElement>(".api-item").forEach((item) => item.addEventListener("click", () => {
+    document.querySelectorAll(".api-item").forEach((node) => node.classList.remove("is-selected"));
+    item.classList.add("is-selected");
+    const api = item.dataset.api ?? "reactive";
+    const examples: Record<string, string> = {
+      reactive: `const state = reactive({ count: 0 });\\neffect(() => output(String(state.count)));\\nstate.count += 1;`,
+      effect: `const stop = effect(() => output(state.count));\\nstate.count += 1;\\nstop();`,
+      computed: `const total = computed(() => cart.price * cart.qty);\\noutput(total.value);`,
+      watch: `const stop = watch(() => state.count, (next) => output(next));\\nstate.count += 1;`,
+    };
+    code.value = examples[api] ?? examples.reactive;
+    state.playgroundCode = code.value;
+    output.textContent = `Selected ${api}()\\n\\nEdit the example, then run it.`;
+  }));
+}
+
 function renderNavigation() {
   const grouped = sections.reduce<Record<string, typeof sections>>((acc, item) => { (acc[item.group] ??= []).push(item); return acc; }, {});
   const nav = document.querySelector("#sidebar-nav");
@@ -114,16 +163,29 @@ renderShell();
 renderNavigation();
 renderDocument();
 renderToc();
+bindPlayground();
 
 document.querySelector("#doc-search")?.addEventListener("input", (event) => { state.query = (event.target as HTMLInputElement).value; });
+document.querySelector<HTMLSelectElement>("#version-select")?.addEventListener("change", (event) => { state.version = (event.target as HTMLSelectElement).value; });
 document.querySelector(".mobile-menu")?.addEventListener("click", () => { state.mobileOpen = !state.mobileOpen; });
 document.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); document.querySelector<HTMLInputElement>("#doc-search")?.focus(); } });
 document.querySelectorAll<HTMLElement>("[data-section]").forEach((item) => item.addEventListener("click", () => { state.active = item.dataset.section ?? "overview"; }));
 
 effect(() => {
-  renderNavigation();
+  const query = state.query;
+  void query;
   renderDocument();
+  renderNavigation();
   renderToc();
+  bindPlayground();
+});
+
+effect(() => {
+  const version = state.version;
+  document.querySelectorAll<HTMLElement>("[data-version-label]").forEach((node) => { node.textContent = version; });
+  const description = document.querySelector<HTMLElement>("[data-version-description]");
+  if (description) description.textContent = versions[version as keyof typeof versions];
+  document.querySelector(".version-control select")?.setAttribute("value", version);
   document.querySelector(".sidebar")?.classList.toggle("is-open", state.mobileOpen);
   document.querySelectorAll<HTMLElement>("[data-copy] span").forEach((label) => { if (state.copied) label.textContent = "Copied"; });
 });
