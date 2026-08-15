@@ -51,6 +51,8 @@ h1 em { color:var(--vermilion); }
 .text-link { font:500 12px 'IBM Plex Mono',monospace; border-bottom:1px solid var(--vermilion); padding-bottom:3px; }
 .hero-art { position:relative; transform:translateY(3px); }
 .hero-art img { display:block; width:100%; aspect-ratio:1.22; object-fit:cover; filter:saturate(.82) contrast(.98); box-shadow:var(--shadow); }
+.hero-illustration { display:block; width:100%; aspect-ratio:1.22; background:#f5eddf; box-shadow:var(--shadow); overflow:hidden; }
+.hero-illustration svg { display:block; width:100%; height:100%; }
 .art-caption { display:flex; justify-content:space-between; margin-top:10px; color:#8a8e89; }
 .reading-layout { display:grid; grid-template-columns:minmax(0,720px) 170px; gap:65px; padding:55px 6vw 100px; max-width:1120px; }
 .document-meta { display:flex; gap:25px; color:#8a8e89; border-bottom:1px solid var(--line); padding-bottom:18px; }

@@ -2,11 +2,11 @@
 
 ## Vercel Deployment Fix
 
-- [ ] Inspect Vercel project settings and deployment output for raw source serving.
-- [ ] Add static OneKit build/output and SPA route fallback configuration.
-- [ ] Ensure server/index.ts is not exposed as the deployed entrypoint.
-- [ ] Run production build and verify deployed route behavior.
-- [ ] Save a deployment fix checkpoint.
+- [x] Inspect Vercel project settings and deployment output for raw source serving.
+- [x] Add static OneKit build/output and SPA route fallback configuration.
+- [x] Ensure server/index.ts is not exposed as the deployed entrypoint.
+- [x] Run production build and verify deployed route behavior.
+- [x] Save a deployment fix checkpoint.
 
 
 ## OneKit-only Web Migration
