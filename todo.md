@@ -1,5 +1,14 @@
 # Docu Web Feature TODO
 
+## Vercel Deployment Fix
+
+- [ ] Inspect Vercel project settings and deployment output for raw source serving.
+- [ ] Add static OneKit build/output and SPA route fallback configuration.
+- [ ] Ensure server/index.ts is not exposed as the deployed entrypoint.
+- [ ] Run production build and verify deployed route behavior.
+- [ ] Save a deployment fix checkpoint.
+
+
 ## OneKit-only Web Migration
 
 - [x] Audit source imports, package dependencies, entrypoint, and build config for non-OneKit runtime usage.
