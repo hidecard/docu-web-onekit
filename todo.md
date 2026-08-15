@@ -1,11 +1,20 @@
 # Docu Web Feature TODO
 
+## OneKit-only Web Migration
+
+- [x] Audit source imports, package dependencies, entrypoint, and build config for non-OneKit runtime usage.
+- [x] Keep the UI, route state, interactivity, and sandbox runner on OneKit JS only.
+- [x] Remove unused React, Wouter, and shadcn runtime dependencies/configuration where safe.
+- [x] Run OneKit-only type-check, build, preview, and dependency audit.
+- [x] Save a checkpoint and push the OneKit-only update to GitHub.
+
+
 ## GitHub Publish
 
-- [ ] Inspect local Git state and confirm repository availability.
-- [ ] Create or connect the private `docu-web-onekit` GitHub repository.
-- [ ] Commit and push the Docu Web source code.
-- [ ] Verify the remote URL, branch, and pushed commit.
+- [x] Inspect local Git state and confirm repository availability.
+- [x] Create or connect the private `docu-web-onekit` GitHub repository.
+- [x] Commit and push the Docu Web source code.
+- [x] Verify the remote URL, branch, and pushed commit.
 
 
 ## Reusable Skill Creation
