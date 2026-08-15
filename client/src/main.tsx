@@ -94,42 +94,56 @@ state.count += <span class="num">1</span>;</code></pre></div></section>`,
   production: `<section class="doc-section" data-id="production"><div class="section-kicker"><span>06</span><span>SHIP IT</span></div><h2>Production checklist</h2><p>Before publishing, run the same checks that protect the package: type-checking, tests, a clean build, and package verification.</p><div class="checklist"><div><span>01</span><strong>Type-check</strong><code>npm run type-check</code></div><div><span>02</span><strong>Test</strong><code>npm test -- --runInBand</code></div><div><span>03</span><strong>Build</strong><code>npm run build</code></div></div></section>`,
 };
 
-sectionMarkup.api = `<section class="doc-section api-section" data-id="api"><div class="section-kicker"><span>07</span><span>REFERENCE</span></div><div class="api-heading"><div><h2>API reference, in motion</h2><p>Read the primitive, then change it. This playground runs a safe, browser-only subset of the example so the feedback loop stays visible.</p></div><div class="api-version-badge"><span class="eyebrow">Selected version</span><strong data-version-label>${state.version}</strong><small data-version-description>${versions[state.version as keyof typeof versions]}</small></div></div><div class="api-grid"><div class="api-index"><div class="api-index-head"><span>PUBLIC API</span><span>TYPE</span></div><button class="api-item is-selected" data-api="reactive"><span><code>reactive()</code><small>Proxy-backed state</small></span><b>fn</b></button><button class="api-item" data-api="effect"><span><code>effect()</code><small>Tracked side effect</small></span><b>fn</b></button><button class="api-item" data-api="computed"><span><code>computed()</code><small>Lazy derived value</small></span><b>fn</b></button><button class="api-item" data-api="watch"><span><code>watch()</code><small>Observe a source</small></span><b>fn</b></button></div><div class="playground"><div class="playground-bar"><span class="playground-title"><i></i>LIVE PLAYGROUND</span><span class="playground-meta" data-version-label>${state.version}</span></div><div class="playground-editor"><textarea id="playground-code" spellcheck="false" aria-label="OneKit playground code">${state.playgroundCode}</textarea><div class="playground-output"><div class="output-head"><span>OUTPUT</span><span>SAFE RUNTIME</span></div><pre id="playground-output">${state.playgroundOutput}</pre></div></div><div class="playground-actions"><button class="button button-dark" id="run-playground">Run example ${icon("arrow")}</button><button class="text-button" id="reset-playground">Reset</button><span class="playground-hint">Try changing <code>count += 1</code></span></div></div></div></section>`;
+sectionMarkup.api = `<section class="doc-section api-section" data-id="api"><div class="section-kicker"><span>07</span><span>REFERENCE</span></div><div class="api-heading"><div><h2>API reference, in motion</h2><p>Read the primitive, then change it. This playground runs a safe, browser-only subset of the example so the feedback loop stays visible.</p></div><div class="api-version-badge"><span class="eyebrow">Selected version</span><strong data-version-label>${state.version}</strong><small data-version-description>${versions[state.version as keyof typeof versions]}</small></div></div><div class="api-grid"><div class="api-index"><div class="api-index-head"><span>PUBLIC API</span><span>TYPE</span></div><button class="api-item is-selected" data-api="reactive"><span><code>reactive()</code><small>Proxy-backed state</small></span><b>fn</b></button><button class="api-item" data-api="effect"><span><code>effect()</code><small>Tracked side effect</small></span><b>fn</b></button><button class="api-item" data-api="computed"><span><code>computed()</code><small>Lazy derived value</small></span><b>fn</b></button><button class="api-item" data-api="watch"><span><code>watch()</code><small>Observe a source</small></span><b>fn</b></button></div><div class="playground"><div class="playground-bar"><span class="playground-title"><i></i>LIVE PLAYGROUND</span><span class="playground-meta" data-version-label>${state.version}</span></div><div class="playground-editor"><textarea id="playground-code" spellcheck="false" aria-label="OneKit playground code">${state.playgroundCode}</textarea><div class="playground-output"><div class="output-head"><span>OUTPUT</span><span>IFRAME SANDBOX</span></div><iframe id="playground-frame" title="Sandboxed OneKit playground" sandbox="allow-scripts"></iframe></div></div><div class="playground-actions"><button class="button button-dark" id="run-playground">Run example ${icon("arrow")}</button><button class="text-button" id="reset-playground">Reset</button><span class="playground-hint">Try changing <code>count += 1</code></span></div></div></div></section>`;
+
+const runnerSrcDoc = `<!doctype html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:15px;background:#11242e;color:#a9cba1;font:12px/1.75 monospace;white-space:pre-wrap}#status{color:#71878c;font-size:10px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}#output{color:#a9cba1}</style></head><body><div id="status">SAFE RUNTIME · READY</div><div id="output">Run the example to see OneKit react.</div><script>
+const outputNode=document.getElementById('output'); const statusNode=document.getElementById('status');
+const send=(message)=>parent.postMessage({source:'docu-onekit-runner',...message},'*');
+let OneKitRuntime=null;
+function paint(text){outputNode.textContent=String(text);}
+window.addEventListener('message',(event)=>{const data=event.data;if(!data||data.type!=='run'||!OneKitRuntime)return;statusNode.textContent='SAFE RUNTIME · RUNNING';outputNode.textContent='';try{const runUserCode=new Function('reactive','effect','computed','watch','output','console','"use strict";\\n'+data.code);runUserCode(OneKitRuntime.reactive,OneKitRuntime.effect,OneKitRuntime.computed,OneKitRuntime.watch,paint,{log:(...args)=>paint(args.join(' '))});statusNode.textContent='SAFE RUNTIME · COMPLETE';send({type:'complete',text:outputNode.textContent})}catch(error){statusNode.textContent='RUNTIME ERROR';outputNode.textContent=(error&&error.name?error.name+': ':'')+(error&&error.message?error.message:String(error));send({type:'error',text:outputNode.textContent})}});
+const runtimeScript=document.createElement('script');runtimeScript.src='/manus-storage/onekit-runtime_c9655d42.js';runtimeScript.onload=()=>{OneKitRuntime=window.OneKit;statusNode.textContent='SAFE RUNTIME · ONEKIT LOADED';send({type:'ready',runtime:'onekit-js'});};runtimeScript.onerror=()=>{statusNode.textContent='RUNTIME LOAD ERROR';outputNode.textContent='Unable to load the OneKit runtime.';send({type:'error',text:outputNode.textContent});};document.head.appendChild(runtimeScript);
+</script></body></html>`;
+
+function resetRunner(frame: HTMLIFrameElement) {
+  frame.srcdoc = runnerSrcDoc;
+  frame.dataset.ready = "true";
+}
 
 function bindPlayground() {
   const code = document.querySelector<HTMLTextAreaElement>("#playground-code");
   const run = document.querySelector<HTMLButtonElement>("#run-playground");
   const reset = document.querySelector<HTMLButtonElement>("#reset-playground");
-  const output = document.querySelector<HTMLElement>("#playground-output");
-  if (!code || !run || !reset || !output || code.dataset.bound === "true") return;
+  const frame = document.querySelector<HTMLIFrameElement>("#playground-frame");
+  if (!code || !run || !reset || !frame || code.dataset.bound === "true") return;
   code.dataset.bound = "true";
+  if (frame.dataset.ready !== "true") resetRunner(frame);
   const defaultCode = state.playgroundCode;
   code.addEventListener("input", () => { state.playgroundCode = code.value; });
+  const w = window as Window & { __docuRunnerBound?: boolean; __docuRunnerTimer?: number };
+  if (!w.__docuRunnerBound) {
+    w.__docuRunnerBound = true;
+    window.addEventListener("message", (event) => {
+      if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
+      if (event.data.type === "complete" || event.data.type === "error") {
+        state.playgroundOutput = event.data.text;
+        if (w.__docuRunnerTimer) window.clearTimeout(w.__docuRunnerTimer);
+      }
+    });
+  }
   run.addEventListener("click", () => {
-    const increment = Number(code.value.match(/count\\s*\\+=\\s*(\\d+)/)?.[1] ?? 1);
-    const lines = code.value.split("\\n").filter(Boolean).length;
-    state.playgroundOutput = `OneKit runtime · ${state.version}\\n\\ncount → ${increment}\\ntracked lines → ${lines}\\n\\n✓ effect flushed successfully`;
-    output.textContent = state.playgroundOutput;
+    if (frame.contentWindow) {
+      state.playgroundOutput = "Running in sandbox…";
+      frame.contentWindow.postMessage({ type: "run", version: state.version, code: code.value }, "*");
+      w.__docuRunnerTimer = window.setTimeout(() => { state.playgroundOutput = "Execution timed out. The sandbox was reset."; resetRunner(frame); }, 900);
+    }
   });
-  reset.addEventListener("click", () => {
-    code.value = defaultCode;
-    state.playgroundCode = defaultCode;
-    state.playgroundOutput = "Run the example to see OneKit react.";
-    output.textContent = state.playgroundOutput;
-  });
+  reset.addEventListener("click", () => { code.value = defaultCode; state.playgroundCode = defaultCode; state.playgroundOutput = "Run the example to see OneKit react."; resetRunner(frame); });
   document.querySelectorAll<HTMLButtonElement>(".api-item").forEach((item) => item.addEventListener("click", () => {
-    document.querySelectorAll(".api-item").forEach((node) => node.classList.remove("is-selected"));
-    item.classList.add("is-selected");
+    document.querySelectorAll(".api-item").forEach((node) => node.classList.remove("is-selected")); item.classList.add("is-selected");
     const api = item.dataset.api ?? "reactive";
-    const examples: Record<string, string> = {
-      reactive: `const state = reactive({ count: 0 });\\neffect(() => output(String(state.count)));\\nstate.count += 1;`,
-      effect: `const stop = effect(() => output(state.count));\\nstate.count += 1;\\nstop();`,
-      computed: `const total = computed(() => cart.price * cart.qty);\\noutput(total.value);`,
-      watch: `const stop = watch(() => state.count, (next) => output(next));\\nstate.count += 1;`,
-    };
-    code.value = examples[api] ?? examples.reactive;
-    state.playgroundCode = code.value;
-    output.textContent = `Selected ${api}()\\n\\nEdit the example, then run it.`;
+    const examples: Record<string, string> = { reactive: `const state = reactive({ count: 0 });\\neffect(() => output(String(state.count)));\\nstate.count += 1;`, effect: `const state = reactive({ count: 0 });\\nconst stop = effect(() => output(state.count));\\nstate.count += 1;\\nstop();`, computed: `const cart = reactive({ price: 20, qty: 2 });\\nconst total = computed(() => cart.price * cart.qty);\\noutput(total.value);`, watch: `const state = reactive({ count: 0 });\\nwatch(() => state.count, (next) => output(next));\\nstate.count += 1;` };
+    code.value = examples[api] ?? examples.reactive; state.playgroundCode = code.value; resetRunner(frame);
   }));
 }
 
