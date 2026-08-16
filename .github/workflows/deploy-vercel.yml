@@ -44,14 +44,14 @@ jobs:
         run: pnpm run check && pnpm run build:client
 
       - name: Pull Vercel project settings
-        run: pnpm dlx --yes vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token="$VERCEL_TOKEN"
+        run: pnpm dlx vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token="$VERCEL_TOKEN"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Build with Vercel
-        run: pnpm dlx --yes vercel build ${{ github.event_name == 'pull_request' && '' || '--prod' }} --token="$VERCEL_TOKEN"
+        run: pnpm dlx vercel build ${{ github.event_name == 'pull_request' && '' || '--prod' }} --token="$VERCEL_TOKEN"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -61,9 +61,9 @@ jobs:
         id: deploy
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            URL=$(pnpm dlx --yes vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+            URL=$(pnpm dlx vercel deploy --prebuilt --token="$VERCEL_TOKEN")
           else
-            URL=$(pnpm dlx --yes vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+            URL=$(pnpm dlx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
           fi
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to $URL"

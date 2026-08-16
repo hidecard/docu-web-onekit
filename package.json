@@ -10,6 +10,11 @@
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
+    "verify:docs": "node scripts/verify-docs.mjs",
+    "verify:runtime": "node scripts/verify-runtime.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
+    "test:unit": "vitest run client/tests/docs.test.mjs",
+    "test": "pnpm run verify:docs && pnpm run verify:runtime && pnpm run test:unit",
     "format": "prettier --write ."
   },
   "dependencies": {

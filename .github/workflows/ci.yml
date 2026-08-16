@@ -40,3 +40,23 @@ jobs:
 
       - name: Build client
         run: pnpm run build:client
+
+      - name: Verify documentation and runtime
+        run: pnpm run test
+
+      - name: Start preview server
+        run: pnpm run preview -- --host 127.0.0.1 > /tmp/docu-preview.log 2>&1 &
+
+      - name: Wait for preview server
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/docu-preview.log
+          exit 1
+
+      - name: Run HTTP smoke test
+        run: pnpm run smoke
