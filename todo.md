@@ -181,3 +181,10 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [ ] Improve long-form docs navigation, table of contents, progress cues, code readability, search, and mobile/tablet UX.
 - [ ] Validate documented APIs/examples, links, accessibility, type-check, tests, production build, and responsive routes.
 - [ ] Commit and push the detailed manual update to `docu-web-onekit` `main`.
+
+### Detailed manual implementation record
+
+- [x] Added architecture, deep reactivity, real-project recipes, React/Vue migration, performance, and troubleshooting chapters in `client/src/main.tsx`.
+- [x] Pushed commit `e11709a` to `main`; `origin/main` is synchronized and the working tree was clean immediately after push.
+- [x] Existing documentation markers, framework scan, prior responsive browser checks, and `git diff --check` passed.
+- [ ] Fresh full validation rerun remains to be completed separately because long-running preview/watch processes caused the combined command to time out; no failure output was produced.
