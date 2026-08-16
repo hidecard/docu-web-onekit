@@ -1,0 +1,74 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: netlify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    name: Netlify deployment
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate and build
+        run: pnpm run check && pnpm run build:client
+
+      - name: Deploy preview to Netlify
+        if: github.event_name == 'pull_request'
+        id: preview
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist/public'
+          production-deploy: false
+          deploy-message: 'Preview for PR #${{ github.event.pull_request.number }}'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          enable-pull-request-comment: true
+          enable-commit-comment: false
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Deploy production to Netlify
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist/public'
+          production-deploy: true
+          deploy-message: 'Production deploy from ${{ github.sha }}'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
