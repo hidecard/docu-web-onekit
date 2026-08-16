@@ -101,7 +101,7 @@ function renderShell() {
           </article><aside class="toc" aria-label="On this page"><span class="eyebrow">On this page</span><div id="toc-links"></div><div class="toc-note"><span class="red-rule"></span><p>Keep the surface small. Let the state do the work.</p></div></aside></div>
           </main>
         </div>
-        <footer class="footer"><span>Docu Web / OneKit JS field guide</span><span>Developed by Arkar Yab</span></footer>
+        <footer class="footer"><span>Docu Web / OneKit JS field guide</span><span>Developed by Arkar Yan</span></footer>
       </div>
     </div>`;
 }
