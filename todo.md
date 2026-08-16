@@ -167,4 +167,17 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
   - [x] Added readable guide cards, narrow-screen spacing, touch-friendly controls, horizontal code overflow protection, and responsive layout rules.
 - [x] Run documentation verification, unit tests, type-check, production build, accessibility checks, responsive browser smoke tests, and diff validation.
   - [x] TypeScript passed; Vitest 1 file / 3 tests passed; Vite production build passed; framework scan passed; browser verified the home and data-layer routes; `git diff --check` passed.
-- [ ] Commit and push the expanded guides and responsive UI/UX update to `docu-web-onekit` `main`.
+- [x] Commit and push the expanded guides and responsive UI/UX update to `docu-web-onekit` `main`.
+  - [x] Pushed commit `f24ac06`; local `main` is synchronized with `origin/main`.
+
+## Detailed Framework-Quality OneKit JS V3 Manual
+
+- [ ] Audit existing docs for missing beginner, core, advanced, production, API, recipe, migration, troubleshooting, and best-practice chapters.
+- [ ] Add a detailed learning path from first principles to a complete production application.
+- [ ] Expand every V3 feature guide with concepts, API signatures, complete examples, alternatives, pitfalls, and production notes.
+- [ ] Add API reference tables and real-project recipes for CRUD, auth boundaries, dashboards, forms, routing, SSR, and testing.
+- [ ] Add migration guides from React/Vue-style mental models and an explicit OneKit architecture guide.
+- [ ] Add troubleshooting, performance, accessibility, security, deployment, and testing playbooks.
+- [ ] Improve long-form docs navigation, table of contents, progress cues, code readability, search, and mobile/tablet UX.
+- [ ] Validate documented APIs/examples, links, accessibility, type-check, tests, production build, and responsive routes.
+- [ ] Commit and push the detailed manual update to `docu-web-onekit` `main`.
