@@ -16,6 +16,22 @@ const requiredExports = [
   "sanitizeHTML",
   "request",
   "validateAccessibility",
+  "snapshot",
+  "bind",
+  "effectScope",
+  "registerDisposable",
+  "devToolsSnapshot",
+  "getResourceGraph",
+  "ok",
+  "evaluateSafeExpression",
+  "deepCloneSafe",
+  "throttle",
+  "validateSelector",
+  "renderOpenGraph",
+  "createStore",
+  "addStorePlugin",
+  "getInstance",
+  "destroy",
 ];
 const missing = requiredExports.filter((name) => !runtime.includes(name));
 if (missing.length) {
