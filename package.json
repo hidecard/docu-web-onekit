@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "onekit-js": "^3.1.13"
+    "onekit-js": "^3.1.17"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.3",

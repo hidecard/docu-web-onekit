@@ -132,3 +132,24 @@
 - [ ] Add responsive mobile presentation for API reference and playground.
 - [x] Run TypeScript check and production build.
 - [x] Verify version switching, sandboxed code execution, reset, runtime errors, and mobile layout in the browser.
+
+## OneKit JS V3 Documentation Update — Main Branch
+
+- [x] Confirm the documentation site uses OneKit JS for runtime state, effects, routing, UI interaction, and sandbox integration; no React, Vue, Svelte, Angular, Wouter, or other frontend framework imports remain in the source.
+- [x] Synchronize the site with OneKit JS `3.1.17` in `client/src/main.tsx`, the sidebar metadata, `package.json`, and `pnpm-lock.yaml`.
+- [x] Keep the beginner learning path and complete V3 feature catalog visible, including reactivity, components, templates/JSX/VDOM, routing, stores, query/forms, HTTP/storage, accessibility, security/CSP, SSR/hydration/streaming, Vite/CLI/testing, HMR/plugins, scopes, DevTools, safe expressions, utilities, and Web Components.
+- [x] Validate documentation markers and runtime exports: 57 content/API markers, accessibility markers, and 28 runtime exports passed.
+- [x] Validate unit tests: 1 Vitest file and 3 tests passed.
+- [x] Validate TypeScript: `tsc --noEmit` passed.
+- [x] Validate production client build: Vite build passed (`95.63 kB` JavaScript, `21.21 kB` CSS before gzip).
+- [x] Validate preview smoke routes: home, features, deployment, and runtime asset all passed.
+- [x] Validate `git diff --check` and record the local npm registry limitation: public `onekit-js@3.1.17` was unavailable during install, so validation used a locally packed OneKit JS `3.1.17` tarball without changing the declared dependency.
+- [ ] Commit and push the OneKit-only V3 documentation update to `docu-web-onekit` `main`.
+
+Remaining documentation polish items from the pre-existing checklist are version-aware API examples, binding playground examples to the selected version, and the final responsive API/playground presentation pass.
+
+---
+
+## Style Decisions
+
+The documentation site follows the selected **Paper Index** direction: Swiss editorial structure, ivory paper surfaces, ink navy text, Bookmark Vermilion accents, asymmetric reading layout, ruled metadata strips, and quiet 180–240ms motion. The implementation remains OneKit-only and keeps code examples close to browser primitives.

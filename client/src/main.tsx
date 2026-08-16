@@ -11,7 +11,7 @@ const state = reactive({
   active: "overview",
   copied: false,
   mobileOpen: false,
-  version: "3.1.16",
+  version: "3.1.17",
   playgroundCode: `const state = reactive({ count: 0 });\neffect(() => output(String(state.count)));\nstate.count += 1;`,
   playgroundOutput: "Run the example to see OneKit react.",
 });
@@ -30,7 +30,7 @@ const sections = [
 ];
 
 const versions = {
-  "3.1.16": "Current · stable",
+  "3.1.17": "Current · stable",
   "3.1.x": "V3 minor line",
   "2.x": "Legacy reference",
 };
@@ -87,7 +87,7 @@ function renderShell() {
         <aside class="sidebar" aria-label="Documentation navigation">
           <div class="sidebar-intro"><span class="eyebrow">The field guide</span><p>Build small, reactive interfaces with a runtime that stays out of your way.</p></div>
           <nav id="sidebar-nav"></nav>
-          <div class="sidebar-foot"><span class="status-dot"></span><span>v3.1.16 · MIT licensed</span></div>
+          <div class="sidebar-foot"><span class="status-dot"></span><span>v3.1.17 · MIT licensed</span></div>
         </aside><button class="drawer-backdrop" aria-label="Close navigation" data-close-drawer></button>
         <main class="main-column">
           <section class="hero" id="overview">
