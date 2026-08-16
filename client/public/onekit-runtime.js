@@ -120,6 +120,8 @@
     const listeners = new Set();
     const history = [];
     const inspectors = new Map();
+    const resources = new Map();
+    const dependencies = new Map();
     const scopeIds = new WeakMap();
     let nextScopeId = 1;
     function isDevToolsEnabled() {
@@ -160,12 +162,22 @@
                         result[name] = { error: 'inspector failed' };
                     }
                 });
+                result.resources = getResourceGraph();
+                result.dependencies = getDependencyGraph();
                 return result;
+            },
+            getResourceGraph() {
+                return Array.from(resources.values(), resource => devToolsSnapshot(resource));
+            },
+            getDependencyGraph() {
+                return getDependencyGraph();
             },
             dispose() {
                 enabled = false;
                 listeners.clear();
                 history.length = 0;
+                resources.clear();
+                dependencies.clear();
                 if (installedGlobalName && typeof window !== 'undefined') {
                     delete window[installedGlobalName];
                 }
@@ -210,6 +222,32 @@
         const id = nextEffectId++;
         effectIds.set(effect, id);
         return id;
+    }
+    function registerDevToolsResource(resource) {
+        if (!enabled)
+            return;
+        resources.set(resource.resourceId, resource);
+    }
+    function disposeDevToolsResource(resourceId) {
+        resources.delete(resourceId);
+        dependencies.delete(resourceId);
+    }
+    function recordDevToolsDependency(effectId, targetId, key) {
+        if (!enabled)
+            return;
+        const effectDependencies = dependencies.get(effectId) ?? new Map();
+        const dependency = { effectId, targetId, key };
+        effectDependencies.set(`${targetId}:${key}`, dependency);
+        dependencies.set(effectId, effectDependencies);
+    }
+    function clearDevToolsDependencies(effectId) {
+        dependencies.delete(effectId);
+    }
+    function getDependencyGraph() {
+        return Array.from(dependencies.values()).flatMap(items => Array.from(items.values(), item => devToolsSnapshot(item)));
+    }
+    function getResourceGraph() {
+        return Array.from(resources.values(), resource => devToolsSnapshot(resource));
     }
     function devToolsSnapshot(value, seen = new WeakMap()) {
         if (value === null || typeof value !== 'object')
@@ -376,12 +414,12 @@
             'ul', 'ol', 'li', 'a', 'img', 'br', 'strong', 'em', 'b', 'i',
             'table', 'thead', 'tbody', 'tr', 'th', 'td', 'input', 'button',
             'main', 'section', 'article', 'header', 'footer', 'nav', 'aside',
-            'form', 'label', 'select', 'option', 'textarea'
+            'form', 'label', 'select', 'option', 'textarea', 'output'
         ],
         ALLOWED_ATTRIBUTES: [
             'id', 'class', 'style', 'href', 'src', 'alt', 'title', 'type',
             'name', 'value', 'placeholder', 'disabled', 'checked', 'selected',
-            'width', 'height', 'colspan', 'rowspan', 'data-*'
+            'width', 'height', 'colspan', 'rowspan', 'role', 'tabindex', 'target', 'rel', 'aria-*', 'inputmode', 'data-*'
         ],
         enableSanitization: true,
         enableValidation: true
@@ -1204,6 +1242,7 @@
         isFlushing = false;
     }
     function cleanup(effectFn) {
+        clearDevToolsDependencies(getDevToolsEffectId(effectFn));
         effectFn.deps.forEach(dep => dep.delete(effectFn));
         effectFn.deps.length = 0;
     }
@@ -1223,6 +1262,7 @@
         if (!dep.has(activeEffect)) {
             dep.add(activeEffect);
             activeEffect.deps.push(dep);
+            recordDevToolsDependency(getDevToolsEffectId(activeEffect), getDevToolsTargetId(target), String(key));
         }
     }
     function trigger(target, key, oldValue, newValue) {
@@ -1329,10 +1369,35 @@
         });
         effectFn.deps = [];
         effectFn.options = options;
+        const effectId = getDevToolsEffectId(effectFn);
+        const ownerScope = getCurrentScope();
+        registerDevToolsResource({
+            resourceId: effectId,
+            ownerId: ownerScope ? getDevToolsScopeId(ownerScope) : null,
+            resourceType: 'effect',
+            createdAt: Date.now(),
+        });
+        emitDevToolsEvent({
+            type: 'resource:lifecycle',
+            resourceId: effectId,
+            ownerId: ownerScope ? getDevToolsScopeId(ownerScope) : null,
+            resourceType: 'effect',
+            phase: 'create',
+        });
         if (!options.lazy) {
             effectFn();
         }
-        onScopeDispose(() => stop(effectFn));
+        onScopeDispose(() => {
+            emitDevToolsEvent({
+                type: 'resource:lifecycle',
+                resourceId: effectId,
+                ownerId: ownerScope ? getDevToolsScopeId(ownerScope) : null,
+                resourceType: 'effect',
+                phase: 'dispose',
+            });
+            disposeDevToolsResource(effectId);
+            stop(effectFn);
+        });
         return effectFn;
     }
     function stop(runner) {
@@ -1771,6 +1836,27 @@
                 binding.element.__onekitTemplateCleanup = binding.cleanup;
             }
         });
+        // Compile text interpolations into fine-grained text-node effects.
+        // Each effect updates only its own text node instead of replacing the root DOM.
+        const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        let currentNode = walker.nextNode();
+        while (currentNode) {
+            textNodes.push(currentNode);
+            currentNode = walker.nextNode();
+        }
+        textNodes.forEach((textNode) => {
+            const source = textNode.nodeValue ?? '';
+            if (!/\{\{[^}]+\}\}/.test(source))
+                return;
+            effect(() => {
+                const rendered = source.replace(/\{\{([^}]+)\}\}/g, (_match, expression) => {
+                    const value = evaluateExpression(String(expression).trim(), context);
+                    return value === undefined || value === null ? '' : String(value);
+                });
+                textNode.nodeValue = rendered;
+            });
+        });
         // Return the first child (the actual template content)
         return container.firstElementChild || container;
     }
@@ -1796,64 +1882,91 @@
     // ok-for directive
     registerDirective('for', {
         bind(ctx) {
-            // ok-for="item in items" or ok-for="(item, index) in items"
             const forMatch = ctx.expression.match(/^\s*\(?(\w+)(?:\s*,\s*(\w+))?\)?\s+in\s+(.+)$/);
             if (!forMatch) {
                 console.error('Invalid ok-for expression:', ctx.expression);
                 return;
             }
             const [, itemName, indexName, collectionExpr] = forMatch;
-            const collection = evaluateExpression(collectionExpr, ctx.rootContext);
-            if (!Array.isArray(collection)) {
-                console.error('ok-for collection must be an array:', collectionExpr);
-                return;
-            }
-            // Store original element
-            const originalElement = ctx.element;
-            const parent = originalElement.parentElement;
+            const templateElement = ctx.element.cloneNode(true);
+            const parent = ctx.element.parentElement;
             if (!parent)
                 return;
-            // Remove original element
-            parent.removeChild(originalElement);
-            // Determine insertion behavior from modifiers: numeric index, 'start' or 'prepend'
-            const insertModifier = (ctx.modifiers || []).find((m) => /^\d+$/.test(m) || m === 'start' || m === 'prepend');
-            // Build clones first so we can insert them in a fragment to preserve order
-            const clones = [];
-            collection.forEach((item, index) => {
-                const clone = originalElement.cloneNode(true);
-                // Create item context
-                const itemContext = { [itemName]: item };
-                if (indexName) {
-                    itemContext[indexName] = index;
+            parent.removeChild(ctx.element);
+            let blocks = new Map();
+            const itemKey = (item, index) => {
+                if (item && typeof item === 'object') {
+                    const record = item;
+                    const key = record.id ?? record.key;
+                    if (typeof key === 'string' || typeof key === 'number')
+                        return key;
                 }
-                // Compile clone with merged root context and item context
-                const compiledClone = compileTemplate(clone.outerHTML, { ...ctx.rootContext, ...itemContext });
-                clones.push(compiledClone);
+                return index;
+            };
+            const renderList = (items) => {
+                if (!Array.isArray(items)) {
+                    console.error('ok-for collection must be an array:', collectionExpr);
+                    return;
+                }
+                const nextBlocks = new Map();
+                const ordered = [];
+                const seenKeys = new Set();
+                items.forEach((item, index) => {
+                    const baseKey = itemKey(item, index);
+                    let key = baseKey;
+                    if (seenKeys.has(baseKey)) {
+                        key = `${String(baseKey)}::duplicate:${index}`;
+                        console.warn(`[OneKit] Duplicate ok-for key "${String(baseKey)}"; using a positional fallback for item ${index}.`);
+                    }
+                    seenKeys.add(key);
+                    const previous = blocks.get(key);
+                    if (previous) {
+                        previous.context[itemName] = item;
+                        if (indexName)
+                            previous.context[indexName] = index;
+                        nextBlocks.set(key, previous);
+                        ordered.push(previous.element);
+                        return;
+                    }
+                    const context = reactive({
+                        ...ctx.rootContext,
+                        [itemName]: item,
+                        ...(indexName ? { [indexName]: index } : {}),
+                    });
+                    const scope = effectScope(true);
+                    const element = scope.run(() => compileTemplate(templateElement.outerHTML, context));
+                    const block = { key, element, scope, context };
+                    nextBlocks.set(key, block);
+                    ordered.push(element);
+                });
+                blocks.forEach((block, key) => {
+                    if (!nextBlocks.has(key))
+                        block.scope.dispose();
+                });
+                ordered.forEach((element, index) => {
+                    const anchor = parent.childNodes[index] ?? null;
+                    if (anchor !== element)
+                        parent.insertBefore(element, anchor);
+                });
+                Array.from(parent.childNodes).forEach((node) => {
+                    if (!ordered.includes(node))
+                        parent.removeChild(node);
+                });
+                blocks = nextBlocks;
+            };
+            ctx.element.__onekitForUpdate = renderList;
+            ctx.element.__onekitForCollectionExpr = collectionExpr;
+            renderList(evaluateExpression(collectionExpr, ctx.rootContext));
+            onScopeDispose(() => {
+                blocks.forEach(block => block.scope.dispose());
+                blocks.clear();
             });
-            if (insertModifier) {
-                // Numeric index
-                let insertIndex;
-                if (/^\d+$/.test(insertModifier)) {
-                    insertIndex = parseInt(insertModifier, 10);
-                }
-                else if (insertModifier === 'start' || insertModifier === 'prepend') {
-                    insertIndex = 0;
-                }
-                const fragment = document.createDocumentFragment();
-                clones.forEach(c => fragment.appendChild(c));
-                if (typeof insertIndex === 'number') {
-                    const refChild = parent.children[insertIndex] || null;
-                    parent.insertBefore(fragment, refChild);
-                }
-                else {
-                    // Fallback to append
-                    parent.appendChild(fragment);
-                }
-            }
-            else {
-                // Default: append in order
-                clones.forEach(c => parent.appendChild(c));
-            }
+        },
+        update(ctx) {
+            const element = ctx.element;
+            const renderList = element.__onekitForUpdate;
+            const collectionExpr = element.__onekitForCollectionExpr;
+            renderList?.(collectionExpr ? evaluateExpression(collectionExpr, ctx.rootContext) : ctx.value);
         }
     });
     // v-bind directive
@@ -1869,13 +1982,28 @@
         const element = ctx.element;
         const attrName = ctx.modifiers[0] || 'value'; // Default to 'value' if no modifier
         if (attrName === 'class') {
-            element.className = ctx.value;
+            element.className = ctx.value == null ? '' : String(ctx.value);
         }
         else if (attrName === 'style') {
-            Object.assign(element.style, ctx.value);
+            if (ctx.value && typeof ctx.value === 'object') {
+                Object.assign(element.style, ctx.value);
+            }
+            else {
+                element.removeAttribute('style');
+            }
+        }
+        else if (attrName === 'href' || attrName === 'src') {
+            const safeURL = ctx.value == null ? '' : sanitizeURL(String(ctx.value));
+            if (safeURL)
+                element.setAttribute(attrName, safeURL);
+            else
+                element.removeAttribute(attrName);
+        }
+        else if (ctx.value == null || ctx.value === false) {
+            element.removeAttribute(attrName);
         }
         else {
-            element.setAttribute(attrName, ctx.value);
+            element.setAttribute(attrName, String(ctx.value));
         }
     }
     // o-model directive
@@ -1980,8 +2108,18 @@
                 if (ctx.modifiers.includes('stop')) {
                     event.stopPropagation();
                 }
-                // Evaluate against the root context and expose the DOM event explicitly.
-                evaluateExpression(ctx.expression, { ...ctx.rootContext, $event: event });
+                // Preserve the reactive root Proxy so methods and state remain available.
+                const eventContext = new Proxy({ $event: event }, {
+                    get(target, key) {
+                        if (key === '$event')
+                            return target.$event;
+                        return ctx.rootContext?.[key];
+                    },
+                    has(_target, key) {
+                        return key === '$event' || key in (ctx.rootContext ?? {});
+                    },
+                });
+                evaluateExpression(ctx.expression, eventContext);
             };
             element.addEventListener(eventType, handler);
             // Store cleanup
@@ -2094,6 +2232,35 @@
     function register(name, definition) {
         components[name] = definition;
     }
+    /** Replace a registered component during HMR while preserving live state and props. */
+    function hotUpdateComponent(name, definition) {
+        const active = Array.from(componentInstances.values()).filter(instance => instance.name === name);
+        const snapshots = active.map(instance => ({
+            instance,
+            state: deepCloneSafe(instance.state),
+            props: deepCloneSafe(instance.props),
+            slots: { ...instance.slots },
+            parent: instance.element?.parentNode,
+            nextSibling: instance.element?.nextSibling,
+            mounted: instance.mounted,
+        }));
+        register(name, definition);
+        snapshots.forEach(snapshot => {
+            const { instance, parent, nextSibling, mounted } = snapshot;
+            destroy(instance);
+            const replacement = create(name, snapshot.props, snapshot.slots);
+            if (!replacement)
+                return;
+            Object.assign(replacement.state, snapshot.state);
+            replacement.update();
+            if (parent && replacement.element && mounted) {
+                mount(replacement, parent);
+                if (nextSibling && nextSibling.parentNode === parent)
+                    parent.insertBefore(replacement.element, nextSibling);
+            }
+        });
+        return snapshots.length;
+    }
     function create(name, props = {}, slots = {}) {
         if (!components[name]) {
             console.error(`Component "${name}" not found`);
@@ -2104,11 +2271,11 @@
         const validatedProps = definition.props ? validateProps(props, definition.props, name) : props;
         const instance = {
             name,
-            props: validatedProps,
+            props: reactive(validatedProps),
             scope: effectScope(true),
             componentId: getDevToolsTargetId({}),
             slots,
-            state: definition.data ? deepCloneSafe(definition.data()) : {},
+            state: reactive(definition.data ? deepCloneSafe(definition.data()) : {}),
             element: null,
             mounted: false,
             listeners: [],
@@ -2181,19 +2348,58 @@
                 definition.updated?.call(this);
             }
         };
-        // Create element
-        if (definition.template) {
-            // Use template engine with directives
-            const context = { ...instance.state, ...instance.props, $slots: instance.slots };
-            instance.element = compileTemplate(definition.template, context);
-        }
-        else if (definition.render) {
-            const html = definition.render.call(instance);
-            const sanitized = sanitizeHTML(html);
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = sanitized;
-            instance.element = tempDiv.firstElementChild;
-        }
+        // Create element inside the component scope so template effects and directive
+        // listeners are disposed automatically when the component is destroyed.
+        const renderBoundary = createErrorBoundary({
+            fallback: (_error) => {
+                const fallback = document.createElement('div');
+                fallback.setAttribute('data-onekit-error-boundary', instance.name);
+                fallback.textContent = 'OneKit component failed to render';
+                return fallback;
+            },
+        });
+        instance.scope.run(() => renderBoundary.render(() => {
+            if (definition.template) {
+                const context = new Proxy({}, {
+                    get(_target, key) {
+                        if (key in instance.state)
+                            return instance.state[key];
+                        if (key in instance.props)
+                            return instance.props[key];
+                        if (key in instance && typeof key === 'string')
+                            return instance[key];
+                        if (key === '$slots')
+                            return instance.slots;
+                        return undefined;
+                    },
+                    has(_target, key) {
+                        return key in instance.state || key in instance.props || key in instance || key === '$slots';
+                    },
+                    set(_target, key, value) {
+                        if (typeof key !== 'string')
+                            return false;
+                        if (key in instance.state) {
+                            instance.state[key] = value;
+                            return true;
+                        }
+                        if (key in instance.props) {
+                            instance.props[key] = value;
+                            return true;
+                        }
+                        return false;
+                    },
+                });
+                instance.element = compileTemplate(definition.template, context);
+            }
+            else if (definition.render) {
+                const html = definition.render.call(instance);
+                const sanitized = sanitizeHTML(html);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = sanitized;
+                instance.element = tempDiv.firstElementChild;
+            }
+            return instance.element ?? document.createElement('div');
+        }));
         // Add lifecycle hooks
         definition.beforeCreate?.call(instance);
         definition.created?.call(instance);
@@ -2974,7 +3180,23 @@
             const result = matched ?? { route, location: to };
             if (route.loader) {
                 try {
-                    result.data = await route.loader(context);
+                    const load = () => route.loader(context);
+                    if (this.options.errorBoundary) {
+                        result.data = await this.options.errorBoundary.renderAsync(async () => await load(), 'route-loader');
+                        if (this.options.errorBoundary.state.error) {
+                            emitDevToolsEvent({
+                                type: 'router:navigation',
+                                phase: 'error',
+                                to: to.fullPath,
+                                from: from?.fullPath ?? null,
+                                route: route.path,
+                                error: this.options.errorBoundary.state.error,
+                            });
+                        }
+                    }
+                    else {
+                        result.data = await load();
+                    }
                 }
                 catch (error) {
                     emitDevToolsEvent({ type: 'router:navigation', phase: 'error', to: to.fullPath, from: from?.fullPath ?? null, route: route.path, error });
@@ -4018,6 +4240,68 @@ ${bodyContent}
         return result;
     }
 
+    function readBlock(source, tag) {
+        const match = source.match(new RegExp(`<${tag}([^>]*)>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+        return match ? { attrs: match[1] ?? '', content: match[2] ?? '' } : null;
+    }
+    function assertNoUnsupportedBlocks(source) {
+        const topLevel = source.replace(/<(script|template|style)(?:\s[^>]*)?>[\s\S]*?<\/\1>/gi, '');
+        const unsupported = topLevel.match(/<([a-z][\w-]*)(?:\s[^>]*)?>/gi)?.filter(tag => {
+            const name = tag.match(/^<([a-z][\w-]*)/i)?.[1]?.toLowerCase();
+            return name && !['script', 'template', 'style'].includes(name);
+        });
+        if (unsupported?.length)
+            throw new Error(`[OneKit] Unsupported .okjs top-level block: ${unsupported[0]}`);
+    }
+    function parseOkjs(source, id = 'component.okjs') {
+        assertNoUnsupportedBlocks(source);
+        const script = readBlock(source, 'script');
+        const template = readBlock(source, 'template');
+        const style = readBlock(source, 'style');
+        if (!template?.content.trim())
+            throw new Error(`[OneKit] .okjs component ${id} must contain a <template> block.`);
+        const lang = script?.attrs.match(/\blang\s*=\s*["'](ts|js)["']/i)?.[1]?.toLowerCase();
+        return {
+            script: script?.content.trim() ?? '',
+            scriptLang: lang ?? 'ts',
+            template: template.content.trim(),
+            style: style?.content.trim() ?? '',
+            styleScoped: Boolean(style?.attrs.match(/\bscoped(?:\s|=|$)/i)),
+        };
+    }
+    function scopeTemplate(template, scopeId) {
+        return template.replace(/^(\s*<([a-z][\w-]*))([^>]*>)/i, `$1 data-okjs-scope="${scopeId}"$3`);
+    }
+    function scopeCss(css, scopeId) {
+        return css.replace(/([^{}]+)\{([^{}]*)\}/g, (_match, selector, body) => {
+            const trimmed = selector.trim();
+            if (!trimmed || trimmed.startsWith('@'))
+                return `${selector}{${body}}`;
+            const scoped = trimmed.split(',').map(item => `[data-okjs-scope="${scopeId}"] ${item.trim()}`).join(', ');
+            return `${scoped}{${body}}`;
+        });
+    }
+    function styleCode(style, id, scoped) {
+        const styleId = `onekit-okjs-${id.replace(/[^a-z0-9_-]/gi, '-')}`;
+        if (!style)
+            return `\nconst __okjsStyleId = ${JSON.stringify(styleId)};\n`;
+        const css = scoped ? scopeCss(style, styleId) : style;
+        return `\nconst __okjsStyleId = ${JSON.stringify(styleId)};\nconst __okjsStyleText = ${JSON.stringify(css)};\nif (typeof document !== 'undefined' && !document.querySelector('[data-okjs-style="' + __okjsStyleId + '"]')) {\n  const __okjsStyle = document.createElement('style');\n  __okjsStyle.setAttribute('data-okjs-style', __okjsStyleId);\n  __okjsStyle.textContent = __okjsStyleText;\n  document.head.appendChild(__okjsStyle);\n}\n`;
+    }
+    function compileOkjs(source, id = 'component.okjs') {
+        const block = parseOkjs(source, id);
+        const styleId = `onekit-okjs-${id.replace(/[^a-z0-9_-]/gi, '-')}`;
+        const template = block.styleScoped ? scopeTemplate(block.template, styleId) : block.template;
+        const script = block.script
+            ? block.script.replace(/export\s+default\s+/, 'const __okjsUserExport = ')
+            : 'const __okjsUserExport = {};';
+        const options = `const __okjsOptions = typeof __okjsUserExport === 'object' && __okjsUserExport !== null ? __okjsUserExport : {};`;
+        const style = styleCode(block.style, id, block.styleScoped);
+        const sourceComment = `\n//# sourceURL=${id}\n`;
+        const code = `import { defineComponent as __okjsDefineComponent, hotUpdateComponent as __okjsHotUpdate } from 'onekit-js';\n${script}\n${options}\nconst __okjsTemplate = ${JSON.stringify(template)};${style}\nconst __okjsComponent = __okjsDefineComponent({ ...__okjsOptions, template: __okjsTemplate });\nexport default __okjsComponent;\nif (import.meta.hot) {\n  import.meta.hot.accept((__okjsNext) => {\n    const __okjsNextComponent = __okjsNext?.default;\n    if (__okjsNextComponent?.name) __okjsHotUpdate(__okjsNextComponent.name, __okjsNextComponent);\n  });\n  import.meta.hot.dispose(() => {\n    if (typeof document !== 'undefined') document.querySelector('[data-okjs-style="' + __okjsStyleId + '"]')?.remove();\n  });\n}\n${sourceComment}`;
+        return { code, map: null };
+    }
+
     // Web Components Integration Module
     const HTMLElementBase = typeof HTMLElement !== 'undefined' ? HTMLElement : class {
     };
@@ -4186,7 +4470,7 @@ ${bodyContent}
     // Main entry point with tree-shaking friendly exports
     // Core systems
     // Version info
-    const VERSION = '3.1.13';
+    const VERSION = '3.1.16';
 
     exports.API = API;
     exports.DependencyInjector = DependencyInjector;
@@ -4208,6 +4492,8 @@ ${bodyContent}
     exports.batch = batch;
     exports.bind = bind;
     exports.cache = cache;
+    exports.clearDevToolsDependencies = clearDevToolsDependencies;
+    exports.compileOkjs = compileOkjs;
     exports.compileTemplate = compileTemplate;
     exports.component = component;
     exports.computed = computed;
@@ -4230,6 +4516,7 @@ ${bodyContent}
     exports.devToolsSnapshot = devToolsSnapshot;
     exports.di = di;
     exports.disableScopeLeakWarnings = disableScopeLeakWarnings;
+    exports.disposeDevToolsResource = disposeDevToolsResource;
     exports.effect = effect;
     exports.effectScope = effectScope;
     exports.emitDevToolsEvent = emitDevToolsEvent;
@@ -4241,11 +4528,14 @@ ${bodyContent}
     exports.getActiveScopeDiagnostics = getActiveScopeDiagnostics;
     exports.getAllStores = getAllStores;
     exports.getCurrentScope = getCurrentScope;
+    exports.getDependencyGraph = getDependencyGraph;
     exports.getDevToolsEffectId = getDevToolsEffectId;
     exports.getDevToolsScopeId = getDevToolsScopeId;
     exports.getDevToolsTargetId = getDevToolsTargetId;
     exports.getInstance = getInstance;
+    exports.getResourceGraph = getResourceGraph;
     exports.h = h;
+    exports.hotUpdateComponent = hotUpdateComponent;
     exports.hydrate = hydrate;
     exports.initTemplateEngine = initTemplateEngine;
     exports.isClient = isClient;
@@ -4267,6 +4557,7 @@ ${bodyContent}
     exports.onPropsChanged = onPropsChanged;
     exports.onScopeDispose = onScopeDispose;
     exports.onUpdated = onUpdated;
+    exports.parseOkjs = parseOkjs;
     exports.patch = patch$1;
     exports.pluginManager = pluginManager;
     exports.post = post;
@@ -4275,8 +4566,10 @@ ${bodyContent}
     exports.preloadStyle = preloadStyle;
     exports.put = put;
     exports.reactive = reactive;
+    exports.recordDevToolsDependency = recordDevToolsDependency;
     exports.register = register;
     exports.registerDevToolsInspector = registerDevToolsInspector;
+    exports.registerDevToolsResource = registerDevToolsResource;
     exports.registerDirective = registerDirective;
     exports.registerDisposable = registerDisposable;
     exports.registerWebComponent = registerWebComponent;
