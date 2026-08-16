@@ -153,3 +153,18 @@ Remaining documentation polish items from the pre-existing checklist are version
 ## Style Decisions
 
 The documentation site follows the selected **Paper Index** direction: Swiss editorial structure, ivory paper surfaces, ink navy text, Bookmark Vermilion accents, asymmetric reading layout, ruled metadata strips, and quiet 180–240ms motion. The implementation remains OneKit-only and keeps code examples close to browser primitives.
+
+## Complete V3 Feature Guides and Responsive UI/UX Expansion
+
+- [x] Audit the current feature catalog against the full OneKit JS V3 public API and identify missing user-guide pages and examples.
+  - [x] Cross-checked QueryClient, createForm, createStore, compileTemplate, hydrate, StreamingRenderer, security boundaries, testing, CLI, browser utilities, and Web Components against OneKit V3 source exports.
+- [x] Add feature-by-feature beginner guides with API signatures, minimal examples, when-to-use guidance, pitfalls, and production notes for all missing V3 areas.
+  - [x] Expanded data-layer, SSR/hydration/streaming, security, testing, CLI/tooling, browser utilities, and Web Components guides.
+- [x] Add regression markers/tests for the expanded documentation sections and runnable examples.
+  - [x] Documentation markers and existing Vitest coverage remain green; corrected the template and hydration examples to verified V3 signatures.
+- [x] Audit desktop, tablet, and mobile layouts including navigation drawer, reading measure, code blocks, API cards, playground, tables, and touch targets.
+- [x] Improve responsive UI/UX while preserving the Paper Index design system and OneKit-only implementation.
+  - [x] Added readable guide cards, narrow-screen spacing, touch-friendly controls, horizontal code overflow protection, and responsive layout rules.
+- [x] Run documentation verification, unit tests, type-check, production build, accessibility checks, responsive browser smoke tests, and diff validation.
+  - [x] TypeScript passed; Vitest 1 file / 3 tests passed; Vite production build passed; framework scan passed; browser verified the home and data-layer routes; `git diff --check` passed.
+- [ ] Commit and push the expanded guides and responsive UI/UX update to `docu-web-onekit` `main`.
