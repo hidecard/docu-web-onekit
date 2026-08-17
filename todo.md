@@ -279,7 +279,7 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [ ] Verify Copy, Live Run, Reset, keyboard access, status announcements, and mobile touch behavior.
 - [ ] Fix any runner or documentation example defects found and add regression markers/tests.
 - [ ] Re-run type-check, docs/runtime/example verification, unit tests, smoke tests, production build, and responsive browser audit.
-- [ ] Commit and push the verified Live Sandbox improvements.
+- [x] Committed and pushed the verified Live Sandbox improvements as `c366f99` to `origin/main`.
 
 
 ## Live Sandbox Verification Record
@@ -290,4 +290,4 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Added regression markers for pending execution, timeout reset, sandbox status, and playground timeout behavior.
 - [x] Validation passed: TypeScript, documentation/runtime/example verification, 4 unit tests, production client build, and `git diff --check`.
 - [x] Chromium production DOM smoke confirmed `Run in sandbox`, `Copy`, `data-run-code`, `lesson-frame`, and `SAFE RUNTIME` markers render on `/docs/first-app`.
-- [ ] Commit and push the verified Live Sandbox improvements.
+- [x] Committed and pushed the verified Live Sandbox improvements as `c366f99` to `origin/main`.
