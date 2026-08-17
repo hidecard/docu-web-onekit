@@ -267,4 +267,4 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Preserved existing runnable cards, Copy/Live Run/Reset controls, sandbox output, route navigation, and version selector.
 - [x] Validation passed after expansion: `tsc --noEmit`, docs verification (57 markers), accessibility markers, runtime verification (28 exports), example verification (14 imports), Vitest (4 tests), Vite production build, and `git diff --check`.
 - [x] Browser audit passed on `/docs/ssr` and `/docs/reactive` desktop routes; a 390px `/docs/reactive` capture showed wrapped heading, separated outcome chips, stacked step explanations, and no visible horizontal overflow.
-- [ ] Commit and push the detailed course expansion and CSS refinements.
+- [x] Committed and pushed the detailed course expansion and CSS refinements as `5014853` to `origin/main`.
