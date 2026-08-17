@@ -22,7 +22,7 @@ describe("documentation release surface", () => {
 
   it("keeps the selected-version policy and current route surface explicit", async () => {
     const source = await read("client/src/main.tsx");
-    for (const marker of ["versionPolicies", "data-version-policy", "architecture", "deep-reactivity", "recipes", "migration", "performance", "troubleshooting", "notFound", "404 · NOT FOUND", "Escape", "data-close-drawer", "runnerSrcDoc", "id=\"count\"", "SAFE RUNTIME · COMPLETE", "frame.dataset.pendingCode", "TIMEOUT: sandbox reset", "sandboxing example…", "Execution timed out. The sandbox was reset."]) {
+    for (const marker of ["versionPolicies", "data-version-policy", "architecture", "deep-reactivity", "recipes", "migration", "performance", "troubleshooting", "notFound", "404 · NOT FOUND", "Escape", "data-close-drawer", "runnerSrcDoc", "id=\"count\"", "SAFE RUNTIME · COMPLETE", "frame.dataset.pendingCode", "TIMEOUT: sandbox reset", "sandboxing example…", "Execution timed out. The sandbox was reset.", "runnerBusBound", "runnerTimers", "entries.slice(-50)", "aria-hidden", "toggleAttribute(\"inert\"", "drawerReturnFocus", "event.key !== \"Tab\""]) {
       expect(source).toContain(marker);
     }
     expect(source).not.toContain("/docs/deployment");

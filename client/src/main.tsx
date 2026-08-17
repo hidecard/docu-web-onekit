@@ -325,9 +325,9 @@ const runnerSrcDoc = `<!doctype html><html><head><meta charset="UTF-8"><style>bo
 const outputNode=document.getElementById('output'); const statusNode=document.getElementById('status'); const appNode=document.getElementById('app');
 const send=(message)=>parent.postMessage({source:'docu-onekit-runner',...message},'*');
 let OneKitRuntime=null;
-function paint(text){outputNode.textContent=String(text);}
-window.addEventListener('message',async(event)=>{const data=event.data;if(!data||data.type!=='run'||!OneKitRuntime)return;statusNode.textContent='SAFE RUNTIME · RUNNING';outputNode.textContent='';try{const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;const runUserCode=new AsyncFunction('reactive','effect','computed','watch','snapshot','bind','nextTick','autorun','defineComponent','register','create','mount','getInstance','destroy','setupComponent','onPropsChanged','h','render','ok','createRouter','defineStore','createStore','useStore','getAllStores','removeStore','addStorePlugin','localStorage','announce','setAriaAttributes','registerWebComponent','get','post','deepCloneSafe','throttle','validateSelector','evaluateSafeExpression','devToolsSnapshot','getResourceGraph','renderOpenGraph','safeMethod','sanitizeHTML','sanitizeURL','withScope','effectScope','onScopeDispose','renderTitle','renderMeta','debounce','generateId','compileTemplate','initTemplateEngine','createElement','patch','sessionStorage','cache','onMounted','onUpdated','onDestroyed','parseOkjs','compileOkjs','enableDevTools','isDevToolsEnabled','createLoadingBoundary','renderToString','hydrate','createSSRContext','addToHead','addStyle','preloadModule','createSkipLink','trapFocus','validateAccessibility','sanitizeInput','generateCSPHeader','updateSecurityConfig','preloadScript','preloadStyle','addScript','createErrorBoundary','errorHandler','request','put','del','preserveHMRState','registerHMRDisposable','registerDirective','output','console','document','"use strict";\\n'+data.code);await runUserCode(OneKitRuntime.reactive,OneKitRuntime.effect,OneKitRuntime.computed,OneKitRuntime.watch,OneKitRuntime.snapshot,OneKitRuntime.bind,OneKitRuntime.nextTick,OneKitRuntime.autorun,OneKitRuntime.defineComponent,OneKitRuntime.register,OneKitRuntime.create,OneKitRuntime.mount,OneKitRuntime.getInstance,OneKitRuntime.destroy,OneKitRuntime.setupComponent,OneKitRuntime.onPropsChanged,OneKitRuntime.h,OneKitRuntime.render,OneKitRuntime.ok,OneKitRuntime.createRouter,OneKitRuntime.defineStore,OneKitRuntime.createStore,OneKitRuntime.useStore,OneKitRuntime.getAllStores,OneKitRuntime.removeStore,OneKitRuntime.addStorePlugin,OneKitRuntime.localStorage,OneKitRuntime.announce,OneKitRuntime.setAriaAttributes,OneKitRuntime.registerWebComponent,OneKitRuntime.get,OneKitRuntime.post,OneKitRuntime.deepCloneSafe,OneKitRuntime.throttle,OneKitRuntime.validateSelector,OneKitRuntime.evaluateSafeExpression,OneKitRuntime.devToolsSnapshot,OneKitRuntime.getResourceGraph,OneKitRuntime.renderOpenGraph,OneKitRuntime.safeMethod,OneKitRuntime.sanitizeHTML,OneKitRuntime.sanitizeURL,OneKitRuntime.withScope,OneKitRuntime.effectScope,OneKitRuntime.onScopeDispose,OneKitRuntime.renderTitle,OneKitRuntime.renderMeta,OneKitRuntime.debounce,OneKitRuntime.generateId,OneKitRuntime.compileTemplate,OneKitRuntime.initTemplateEngine,OneKitRuntime.createElement,OneKitRuntime.patch,OneKitRuntime.sessionStorage,OneKitRuntime.cache,OneKitRuntime.onMounted,OneKitRuntime.onUpdated,OneKitRuntime.onDestroyed,OneKitRuntime.parseOkjs,OneKitRuntime.compileOkjs,OneKitRuntime.enableDevTools,OneKitRuntime.isDevToolsEnabled,OneKitRuntime.createLoadingBoundary,OneKitRuntime.renderToString,OneKitRuntime.hydrate,OneKitRuntime.createSSRContext,OneKitRuntime.addToHead,OneKitRuntime.addStyle,OneKitRuntime.preloadModule,OneKitRuntime.createSkipLink,OneKitRuntime.trapFocus,OneKitRuntime.validateAccessibility,OneKitRuntime.sanitizeInput,OneKitRuntime.generateCSPHeader,OneKitRuntime.updateSecurityConfig,OneKitRuntime.preloadScript,OneKitRuntime.preloadStyle,OneKitRuntime.addScript,OneKitRuntime.createErrorBoundary,OneKitRuntime.errorHandler,OneKitRuntime.request,OneKitRuntime.put,OneKitRuntime.del,OneKitRuntime.preserveHMRState,OneKitRuntime.registerHMRDisposable,OneKitRuntime.registerDirective,paint,{log:(...args)=>paint(args.join(' '))},document);if(!outputNode.textContent.trim()){outputNode.textContent=appNode.textContent.trim()||'Completed';}statusNode.textContent='SAFE RUNTIME · COMPLETE';send({type:'complete',text:outputNode.textContent})}catch(error){statusNode.textContent='RUNTIME ERROR';outputNode.textContent=(error&&error.name?error.name+': ':'')+(error&&error.message?error.message:String(error));send({type:'error',text:outputNode.textContent})}});
-fetch('/onekit-runtime.js').then(response=>response.text()).then(source=>{const moduleExports={};new Function('exports','module','define',source)(moduleExports,{exports:moduleExports},undefined);OneKitRuntime=moduleExports;statusNode.textContent='SAFE RUNTIME · ONEKIT LOADED';send({type:'ready',runtime:'onekit-js'});}).catch(error=>{statusNode.textContent='RUNTIME LOAD ERROR';outputNode.textContent=String(error);send({type:'error',text:outputNode.textContent});});
+const entries=[]; function paint(text){const value=String(text); entries.push({level:'log',text:value}); outputNode.textContent=entries.map(item=>item.text).join('\\n');}
+window.addEventListener('message',async(event)=>{const data=event.data;if(!data||data.type!=='run'||!OneKitRuntime)return;statusNode.textContent='SAFE RUNTIME · RUNNING';outputNode.textContent='';try{const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;const runUserCode=new AsyncFunction('reactive','effect','computed','watch','snapshot','bind','nextTick','autorun','defineComponent','register','create','mount','getInstance','destroy','setupComponent','onPropsChanged','h','render','ok','createRouter','defineStore','createStore','useStore','getAllStores','removeStore','addStorePlugin','localStorage','announce','setAriaAttributes','registerWebComponent','get','post','deepCloneSafe','throttle','validateSelector','evaluateSafeExpression','devToolsSnapshot','getResourceGraph','renderOpenGraph','safeMethod','sanitizeHTML','sanitizeURL','withScope','effectScope','onScopeDispose','renderTitle','renderMeta','debounce','generateId','compileTemplate','initTemplateEngine','createElement','patch','sessionStorage','cache','onMounted','onUpdated','onDestroyed','parseOkjs','compileOkjs','enableDevTools','isDevToolsEnabled','createLoadingBoundary','renderToString','hydrate','createSSRContext','addToHead','addStyle','preloadModule','createSkipLink','trapFocus','validateAccessibility','sanitizeInput','generateCSPHeader','updateSecurityConfig','preloadScript','preloadStyle','addScript','createErrorBoundary','errorHandler','request','put','del','preserveHMRState','registerHMRDisposable','registerDirective','output','console','document','"use strict";\\n'+data.code);await runUserCode(OneKitRuntime.reactive,OneKitRuntime.effect,OneKitRuntime.computed,OneKitRuntime.watch,OneKitRuntime.snapshot,OneKitRuntime.bind,OneKitRuntime.nextTick,OneKitRuntime.autorun,OneKitRuntime.defineComponent,OneKitRuntime.register,OneKitRuntime.create,OneKitRuntime.mount,OneKitRuntime.getInstance,OneKitRuntime.destroy,OneKitRuntime.setupComponent,OneKitRuntime.onPropsChanged,OneKitRuntime.h,OneKitRuntime.render,OneKitRuntime.ok,OneKitRuntime.createRouter,OneKitRuntime.defineStore,OneKitRuntime.createStore,OneKitRuntime.useStore,OneKitRuntime.getAllStores,OneKitRuntime.removeStore,OneKitRuntime.addStorePlugin,OneKitRuntime.localStorage,OneKitRuntime.announce,OneKitRuntime.setAriaAttributes,OneKitRuntime.registerWebComponent,OneKitRuntime.get,OneKitRuntime.post,OneKitRuntime.deepCloneSafe,OneKitRuntime.throttle,OneKitRuntime.validateSelector,OneKitRuntime.evaluateSafeExpression,OneKitRuntime.devToolsSnapshot,OneKitRuntime.getResourceGraph,OneKitRuntime.renderOpenGraph,OneKitRuntime.safeMethod,OneKitRuntime.sanitizeHTML,OneKitRuntime.sanitizeURL,OneKitRuntime.withScope,OneKitRuntime.effectScope,OneKitRuntime.onScopeDispose,OneKitRuntime.renderTitle,OneKitRuntime.renderMeta,OneKitRuntime.debounce,OneKitRuntime.generateId,OneKitRuntime.compileTemplate,OneKitRuntime.initTemplateEngine,OneKitRuntime.createElement,OneKitRuntime.patch,OneKitRuntime.sessionStorage,OneKitRuntime.cache,OneKitRuntime.onMounted,OneKitRuntime.onUpdated,OneKitRuntime.onDestroyed,OneKitRuntime.parseOkjs,OneKitRuntime.compileOkjs,OneKitRuntime.enableDevTools,OneKitRuntime.isDevToolsEnabled,OneKitRuntime.createLoadingBoundary,OneKitRuntime.renderToString,OneKitRuntime.hydrate,OneKitRuntime.createSSRContext,OneKitRuntime.addToHead,OneKitRuntime.addStyle,OneKitRuntime.preloadModule,OneKitRuntime.createSkipLink,OneKitRuntime.trapFocus,OneKitRuntime.validateAccessibility,OneKitRuntime.sanitizeInput,OneKitRuntime.generateCSPHeader,OneKitRuntime.updateSecurityConfig,OneKitRuntime.preloadScript,OneKitRuntime.preloadStyle,OneKitRuntime.addScript,OneKitRuntime.createErrorBoundary,OneKitRuntime.errorHandler,OneKitRuntime.request,OneKitRuntime.put,OneKitRuntime.del,OneKitRuntime.preserveHMRState,OneKitRuntime.registerHMRDisposable,OneKitRuntime.registerDirective,paint,{log:(...args)=>paint(args.join(' '))},document);if(!outputNode.textContent.trim()){outputNode.textContent=appNode.textContent.trim()||'Completed';}statusNode.textContent='SAFE RUNTIME · COMPLETE';send({type:'complete',text:outputNode.textContent,entries:entries.slice(-50)})}catch(error){statusNode.textContent='RUNTIME ERROR';outputNode.textContent=(error&&error.name?error.name+': ':'')+(error&&error.message?error.message:String(error));send({type:'error',text:outputNode.textContent,error:{name:error&&error.name?error.name:'Error',message:error&&error.message?error.message:String(error),stack:error&&error.stack?String(error.stack):''},entries:entries.slice(-50)})}});
+fetch('/onekit-runtime.js').then(response=>response.text()).then(source=>{const moduleExports={};new Function('exports','module','define',source)(moduleExports,{exports:moduleExports},undefined);OneKitRuntime=moduleExports;statusNode.textContent='SAFE RUNTIME · ONEKIT LOADED';send({type:'ready',runtime:'onekit-js'});}).catch(error=>{statusNode.textContent='RUNTIME LOAD ERROR';outputNode.textContent=String(error);send({type:'error',text:outputNode.textContent,error:{name:error&&error.name?error.name:'Error',message:error&&error.message?error.message:String(error),stack:error&&error.stack?String(error.stack):''},entries:entries.slice(-50)});});
 </script></body></html>`;
 
 function resetRunner(frame: HTMLIFrameElement) {
@@ -336,7 +336,39 @@ function resetRunner(frame: HTMLIFrameElement) {
   frame.dataset.ready = "true";
 }
 
+const runnerFrames = new WeakSet<HTMLIFrameElement>();
+const runnerTimers = new WeakMap<HTMLIFrameElement, number>();
+let runnerBusBound = false;
+function formatRunnerMessage(data: any) {
+  if (data?.type === "error") return `ERROR · ${data.error?.name ?? "RuntimeError"}: ${data.error?.message ?? data.text ?? "runtime failure"}`;
+  if (data?.entries?.length) return `OUTPUT · ${data.entries.map((entry: { text: string }) => entry.text).join(" | ")}`;
+  return `OUTPUT · ${data?.text ?? "Completed"}`;
+}
+function bindRunnerBus() {
+  if (runnerBusBound) return;
+  runnerBusBound = true;
+  window.addEventListener("message", (event) => {
+    if (event.data?.source !== "docu-onekit-runner") return;
+    const frame = Array.from(document.querySelectorAll<HTMLIFrameElement>("iframe")).find((candidate) => candidate.contentWindow === event.source);
+    if (!frame || !runnerFrames.has(frame)) return;
+    if (event.data.type === "ready") {
+      frame.dataset.loaded = "true";
+      const pending = frame.dataset.pendingCode;
+      if (pending && frame.contentWindow) { delete frame.dataset.pendingCode; frame.contentWindow.postMessage({ type: "run", code: pending }, "*"); }
+      const status = (frame.closest(".usage-card, .runnable-card") as HTMLElement | null)?.querySelector("[data-example-status], .run-status") as HTMLElement | null;
+      if (status) status.textContent = "READY · OneKit loaded";
+      return;
+    }
+    const timer = runnerTimers.get(frame);
+    if (timer) { window.clearTimeout(timer); runnerTimers.delete(frame); }
+    const status = (frame.closest(".usage-card, .runnable-card") as HTMLElement | null)?.querySelector("[data-example-status], .run-status") as HTMLElement | null;
+    if (status) status.textContent = formatRunnerMessage(event.data);
+    if (frame.id === "playground-frame") state.playgroundOutput = formatRunnerMessage(event.data);
+  });
+}
+
 function bindUsageRunners() {
+  bindRunnerBus();
   document.querySelectorAll<HTMLElement>(".usage-card").forEach((card) => {
     const run = card.querySelector<HTMLButtonElement>(".example-run");
     const reset = card.querySelector<HTMLButtonElement>(".example-reset");
@@ -350,31 +382,22 @@ function bindUsageRunners() {
       if (timer.id) window.clearTimeout(timer.id);
       status.textContent = "RUNNING";
       frame.contentWindow.postMessage({ type: "run", code }, "*");
-      timer.id = window.setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         status.textContent = "TIMEOUT: sandbox reset";
+        runnerTimers.delete(frame);
         delete frame.dataset.pendingCode;
         resetFrame();
       }, 3000);
+      runnerTimers.set(frame, timeoutId);
     };
     const resetFrame = () => {
       if (timer.id) { window.clearTimeout(timer.id); timer.id = undefined; }
+      const timeoutId = runnerTimers.get(frame); if (timeoutId) { window.clearTimeout(timeoutId); runnerTimers.delete(frame); }
       frame.srcdoc = runnerSrcDoc;
       frame.dataset.loaded = "false";
       status.textContent = "READY";
     };
-    window.addEventListener("message", (event) => {
-      if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
-      if (event.data.type === "ready") {
-        frame.dataset.loaded = "true";
-        status.textContent = "READY";
-        const pending = frame.dataset.pendingCode;
-        if (pending) { delete frame.dataset.pendingCode; execute(pending); }
-      }
-      if (event.data.type === "complete" || event.data.type === "error") {
-        if (timer.id) { window.clearTimeout(timer.id); timer.id = undefined; }
-        status.textContent = event.data.type === "error" ? `ERROR: ${event.data.text ?? "runtime failure"}` : "COMPLETE";
-      }
-    });
+    runnerFrames.add(frame);
     run.addEventListener("click", () => {
       const code = decodeURIComponent(run.dataset.exampleCode ?? "");
       if (frame.dataset.loaded === "true") execute(code);
@@ -386,6 +409,7 @@ function bindUsageRunners() {
 }
 
 function bindLessonRunners() {
+  bindRunnerBus();
   document.querySelectorAll<HTMLButtonElement>("[data-run-code]").forEach((button) => {
     if (button.dataset.bound === "true") return;
     const card = button.closest<HTMLElement>(".runnable-card");
@@ -402,29 +426,20 @@ function bindLessonRunners() {
       if (!frame.contentWindow) return;
       status.textContent = "RUNNING · sandboxing example…";
       frame.contentWindow.postMessage({ type: "run", code }, "*");
-      timer.id = window.setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         status.textContent = "TIMEOUT · example reset";
+        runnerTimers.delete(frame);
         delete frame.dataset.pendingCode;
         resetRunner(frame);
       }, 1200);
+      runnerTimers.set(frame, timeoutId);
     };
     frame.addEventListener("load", () => {
       status.textContent = "SAFE RUNTIME · READY";
       const pending = frame.dataset.pendingCode;
       if (pending) { delete frame.dataset.pendingCode; execute(pending); }
     }, { once: true });
-    window.addEventListener("message", (event) => {
-      if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
-      if (event.data.type === "ready") {
-        frame.dataset.loaded = "true";
-        status.textContent = "READY";
-        const pending = frame.dataset.pendingCode;
-        if (pending) { delete frame.dataset.pendingCode; execute(pending); }
-        return;
-      }
-      if (timer.id) { window.clearTimeout(timer.id); timer.id = undefined; }
-      status.textContent = event.data.type === "error" ? `ERROR · ${event.data.text ?? "runtime failure"}` : `OUTPUT · ${event.data.text ?? "Completed"}`;
-    });
+    runnerFrames.add(frame);
     resetRunner(frame);
     button.addEventListener("click", () => {
       const code = decodeURIComponent(button.dataset.runCode ?? "");
@@ -441,26 +456,17 @@ function bindPlayground() {
   const frame = document.querySelector<HTMLIFrameElement>("#playground-frame");
   if (!code || !run || !reset || !frame || code.dataset.bound === "true") return;
   code.dataset.bound = "true";
+  bindRunnerBus();
+  runnerFrames.add(frame);
   if (frame.dataset.ready !== "true") resetRunner(frame);
   const defaultCode = state.playgroundCode;
   code.addEventListener("input", () => { state.playgroundCode = code.value; });
-  const w = window as Window & { __docuRunnerBound?: boolean; __docuRunnerTimer?: number };
-  if (!w.__docuRunnerBound) {
-    w.__docuRunnerBound = true;
-    window.addEventListener("message", (event) => {
-      if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
-      if (event.data.type === "ready") state.playgroundOutput = "Sandbox ready";
-      if (event.data.type === "complete" || event.data.type === "error") {
-        state.playgroundOutput = event.data.text;
-        if (w.__docuRunnerTimer) { window.clearTimeout(w.__docuRunnerTimer); w.__docuRunnerTimer = undefined; }
-      }
-    });
-  }
   run.addEventListener("click", () => {
     if (frame.contentWindow) {
       state.playgroundOutput = "Running in sandbox…";
       frame.contentWindow.postMessage({ type: "run", version: state.version, code: code.value }, "*");
-      w.__docuRunnerTimer = window.setTimeout(() => { state.playgroundOutput = "Execution timed out. The sandbox was reset."; resetRunner(frame); }, 3000);
+      const timeoutId = window.setTimeout(() => { state.playgroundOutput = "Execution timed out. The sandbox was reset."; runnerTimers.delete(frame); resetRunner(frame); }, 3000);
+      runnerTimers.set(frame, timeoutId);
     }
   });
   reset.addEventListener("click", () => { code.value = defaultCode; state.playgroundCode = defaultCode; state.playgroundOutput = "Run the example to see OneKit react."; resetRunner(frame); });
@@ -541,17 +547,32 @@ document.querySelector<HTMLSelectElement>("#version-select")?.addEventListener("
 const mobileMenu = document.querySelector<HTMLButtonElement>(".mobile-menu");
 const sidebar = document.querySelector<HTMLElement>(".sidebar");
 const backdrop = document.querySelector<HTMLButtonElement>("[data-close-drawer]");
+let drawerReturnFocus: HTMLElement | null = null;
 const setDrawerOpen = (open: boolean) => {
+  if (open && !state.mobileOpen) drawerReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : mobileMenu;
   state.mobileOpen = open;
   sidebar?.classList.toggle("is-open", open);
   backdrop?.classList.toggle("is-visible", open);
   mobileMenu?.setAttribute("aria-expanded", String(open));
+  sidebar?.setAttribute("aria-hidden", String(!open));
+  sidebar?.toggleAttribute("inert", !open);
   document.body.classList.toggle("drawer-open", open);
+  if (open) requestAnimationFrame(() => (sidebar?.querySelector<HTMLElement>("a, button, input") ?? sidebar)?.focus());
+  else requestAnimationFrame(() => drawerReturnFocus?.focus());
 };
 mobileMenu?.setAttribute("aria-expanded", "false");
 mobileMenu?.addEventListener("click", () => setDrawerOpen(!sidebar?.classList.contains("is-open")));
 backdrop?.addEventListener("click", () => setDrawerOpen(false));
-document.addEventListener("keydown", (event) => { if (event.key === "Escape") setDrawerOpen(false); });
+document.addEventListener("keydown", (event) => {
+  if (!state.mobileOpen) return;
+  if (event.key === "Escape") { event.preventDefault(); setDrawerOpen(false); return; }
+  if (event.key !== "Tab" || !sidebar) return;
+  const focusable = Array.from(sidebar.querySelectorAll<HTMLElement>("a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])")).filter((node) => !node.hasAttribute("disabled"));
+  if (!focusable.length) return;
+  const first = focusable[0]; const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+});
 document.addEventListener("keydown", (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); document.querySelector<HTMLInputElement>("#doc-search")?.focus(); } });
 document.addEventListener("click", (event) => {
   const link = (event.target as HTMLElement).closest<HTMLElement>("[data-section]");

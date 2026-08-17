@@ -291,3 +291,31 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Validation passed: TypeScript, documentation/runtime/example verification, 4 unit tests, production client build, and `git diff --check`.
 - [x] Chromium production DOM smoke confirmed `Run in sandbox`, `Copy`, `data-run-code`, `lesson-frame`, and `SAFE RUNTIME` markers render on `/docs/first-app`.
 - [x] Committed and pushed the verified Live Sandbox improvements as `c366f99` to `origin/main`.
+
+
+## Live Sandbox Quality Pass
+
+- [ ] Audit every runnable card for editor availability, output capture, retry/reset behavior, and route lifecycle leaks.
+- [ ] Add an editable code surface or clearly explain read-only limitations for each runnable example.
+- [ ] Capture console logs, thrown errors, and structured completion output instead of only a single status string.
+- [ ] Add retry and rerun behavior after errors/timeouts, with preserved code and a clear reset-to-default action.
+- [ ] Support multiple independent examples on the same route without cross-frame state or listener leakage.
+- [ ] Improve keyboard focus, live announcements, labels, reduced-motion behavior, and mobile touch targets for sandbox controls.
+- [ ] Add browser-level regression coverage for run, reset, timeout, error, copy feedback, and route changes.
+- [ ] Re-run the full validation suite and responsive audit, then commit and push the improvements.
+
+
+## Live Sandbox Quality Pass Record
+
+- [x] Replaced per-frame message listeners with a single OneKit runner message bus guarded by registered iframe frames, preventing rerender listener leaks and cross-example state updates.
+- [x] Added structured output formatting for captured console entries and runtime errors, while preserving existing completion/timeout status contracts.
+- [x] Added per-frame timeout ownership and cleanup on complete/error/reset, including the API playground and independent usage/lesson examples.
+- [x] Preserved pending-code execution until each iframe reports `ready`, with reset/retry behavior that recreates the isolated runtime.
+- [x] Added mobile drawer focus return, `aria-hidden`, `inert`, Escape handling, and Tab focus trapping for keyboard users.
+- [x] Added regression markers covering runner bus, timers, structured entries, timeout compatibility, and drawer focus behavior.
+- [x] Validation passed: TypeScript check, docs/runtime/example verification, 4 unit tests, and production client build.
+- [x] Browser smoke verified API playground rendering and successful sandbox execution at `/docs/api`.
+- [ ] Full browser automation for clipboard permission, thrown-error editing, and timeout interaction remains a manual follow-up because the sandbox browser input path did not mutate the textarea during this audit.
+- [ ] Commit and push the final quality-pass improvements to `docu-web-onekit` `main`.
+
+The current quality-pass implementation intentionally keeps the existing editable API playground and read-only runnable cards explicit through their existing code/read/run/reset presentation; per-card editors are not duplicated where the card is designed as a fixed teaching fixture.
