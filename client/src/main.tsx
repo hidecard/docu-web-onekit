@@ -47,6 +47,11 @@ const versions = {
   "3.1.x": "V3 minor line",
   "2.x": "Legacy reference",
 };
+const versionPolicies = {
+  "3.1.17": "All V3 APIs shown in this manual are available unless a guide marks them experimental.",
+  "3.1.x": "V3 minor line: examples target the stable V3 contract; check release notes for minor additions.",
+  "2.x": "Legacy reference: the core playground stays compatible, but V3-only APIs require an upgrade.",
+};
 
 const routeMeta: Record<string, { title: string; description: string; group: string }> = {
   overview: { title: "Overview", description: "A practical introduction to the OneKit browser runtime.", group: "Start here" },
@@ -72,6 +77,7 @@ const routeMeta: Record<string, { title: string; description: string; group: str
   migration: { title: "Migration guide", description: "Translate React and Vue mental models into OneKit patterns.", group: "Build real apps" },
   performance: { title: "Performance", description: "Keep updates, bundles, network work, and hydration measurable.", group: "Ship it" },
   troubleshooting: { title: "Troubleshooting", description: "Diagnose common setup, routing, rendering, and production failures.", group: "Reference" },
+  notFound: { title: "Page not found", description: "The requested documentation route does not exist.", group: "Not found" },
 };
 
 const sectionPath = (id: string) => id === "overview" ? "/" : `/docs/${id}`;
@@ -157,7 +163,7 @@ sectionMarkup.features = `<section class="doc-section learner-section" data-id="
 sectionMarkup.data = `<section class="doc-section" data-id="data"><div class="section-kicker"><span>10</span><span>REFERENCE</span></div><h2>Docu Data: one source for the field guide</h2><p>Keep documentation content in structured data before rendering it into navigation, search, cards, and route pages. This prevents the guide from drifting when a new framework API is added.</p><div class="data-grid"><div class="data-card"><span class="data-label">SECTION RECORD</span><code>{ id, label, group, number }</code><p>Navigation metadata drives the sidebar, pagination, breadcrumbs, and route lookup.</p></div><div class="data-card"><span class="data-label">ROUTE RECORD</span><code>{ title, description, group }</code><p>Route metadata keeps document titles and descriptions synchronized with the visible section.</p></div><div class="data-card"><span class="data-label">USAGE RECORD</span><code>{ label, importLine, code, note }</code><p>Usage cards share one renderer, one copy action, and one sandbox runner.</p></div></div><div class="code-card"><div class="code-head"><span>data-first pattern</span><button data-copy="const lessons = [{ id: \"reactive\", label: \"Reactive state\", group: \"Core concepts\" }];\nconst visible = lessons.filter(({ label }) => label.toLowerCase().includes(query));">${icon("copy")}<span>Copy</span></button></div><pre><code><span class="kw">const</span> lessons = [{ id: <span class="str">\"reactive\"</span>, label: <span class="str">\"Reactive state\"</span>, group: <span class="str">\"Core concepts\"</span> }];
 <span class="kw">const</span> visible = lessons.filter(({ label }) =&gt; label.toLowerCase().includes(query));</code></pre></div><div class="note-card"><span class="note-label">MAINTENANCE RULE</span><p>When an API changes in <code>onekit-js</code>, update the canonical data and executable example together, then run type-check and production build before publishing.</p></div></section>`;
 
-sectionMarkup.api = `<section class="doc-section api-section" data-id="api"><div class="section-kicker"><span>09</span><span>REFERENCE</span></div><div class="api-heading"><div><h2>API reference, in motion</h2><p>Read the primitive, then change it. This playground runs a safe, browser-only subset of the example so the feedback loop stays visible.</p></div><div class="api-version-badge"><span class="eyebrow">Selected version</span><strong data-version-label>${state.version}</strong><small data-version-description>${versions[state.version as keyof typeof versions]}</small></div></div><div class="api-grid"><div class="api-index"><div class="api-index-head"><span>PUBLIC API</span><span>TYPE</span></div><button class="api-item is-selected" data-api="reactive"><span><code>reactive()</code><small>Proxy-backed state</small></span><b>fn</b></button><button class="api-item" data-api="effect"><span><code>effect()</code><small>Tracked side effect</small></span><b>fn</b></button><button class="api-item" data-api="computed"><span><code>computed()</code><small>Lazy derived value</small></span><b>fn</b></button><button class="api-item" data-api="watch"><span><code>watch()</code><small>Observe a source</small></span><b>fn</b></button></div><div class="playground"><div class="playground-bar"><span class="playground-title"><i></i>LIVE PLAYGROUND</span><span class="playground-meta" data-version-label>${state.version}</span></div><div class="playground-editor"><textarea id="playground-code" spellcheck="false" aria-label="OneKit playground code">${state.playgroundCode}</textarea><div class="playground-output"><div class="output-head"><span>OUTPUT</span><span>IFRAME SANDBOX</span></div><iframe id="playground-frame" title="Sandboxed OneKit playground" sandbox="allow-scripts allow-same-origin"></iframe></div></div><div class="playground-actions"><button class="button button-dark" id="run-playground">Run example ${icon("arrow")}</button><button class="text-button" id="reset-playground">Reset</button><span class="playground-hint">Try changing <code>count += 1</code></span></div></div></div></section>`;
+sectionMarkup.api = `<section class="doc-section api-section" data-id="api"><div class="section-kicker"><span>09</span><span>REFERENCE</span></div><div class="api-heading"><div><h2>API reference, in motion</h2><p>Read the primitive, then change it. This playground runs a safe, browser-only subset of the example so the feedback loop stays visible.</p></div><div class="api-version-badge"><span class="eyebrow">Selected version</span><strong data-version-label>${state.version}</strong><small data-version-description>${versions[state.version as keyof typeof versions]}</small><p class="api-version-policy" data-version-policy>${versionPolicies[state.version as keyof typeof versionPolicies]}</p></div></div><div class="api-grid"><div class="api-index"><div class="api-index-head"><span>PUBLIC API</span><span>TYPE</span></div><button class="api-item is-selected" data-api="reactive"><span><code>reactive()</code><small>Proxy-backed state</small></span><b>fn</b></button><button class="api-item" data-api="effect"><span><code>effect()</code><small>Tracked side effect</small></span><b>fn</b></button><button class="api-item" data-api="computed"><span><code>computed()</code><small>Lazy derived value</small></span><b>fn</b></button><button class="api-item" data-api="watch"><span><code>watch()</code><small>Observe a source</small></span><b>fn</b></button></div><div class="playground"><div class="playground-bar"><span class="playground-title"><i></i>LIVE PLAYGROUND</span><span class="playground-meta" data-version-label>${state.version}</span></div><div class="playground-editor"><textarea id="playground-code" spellcheck="false" aria-label="OneKit playground code">${state.playgroundCode}</textarea><div class="playground-output"><div class="output-head"><span>OUTPUT</span><span>IFRAME SANDBOX</span></div><iframe id="playground-frame" title="Sandboxed OneKit playground" sandbox="allow-scripts allow-same-origin"></iframe></div></div><div class="playground-actions"><button class="button button-dark" id="run-playground">Run example ${icon("arrow")}</button><button class="text-button" id="reset-playground">Reset</button><span class="playground-hint">Try changing <code>count += 1</code></span></div></div></div></section>`;
 
 const guideCard = (label: string, api: string, example: string, useWhen: string, pitfalls: string) => `<article class="guide-card"><div class="guide-card-head"><span>${label}</span><code>${api}</code></div><p><strong>Use it when:</strong> ${useWhen}</p><pre><code>${example}</code></pre><p class="guide-pitfall"><strong>Watch for:</strong> ${pitfalls}</p></article>`;
 const guideSection = (id: string, number: string, kicker: string, title: string, intro: string, cards: string) => `<section class="doc-section expanded-guide" data-id="${id}"><div class="section-kicker"><span>${number}</span><span>${kicker}</span></div><h2>${title}</h2><p class="guide-intro">${intro}</p><div class="guide-grid">${cards}</div></section>`;
@@ -359,7 +365,7 @@ function bindPlayground() {
 }
 
 function applyRouteMeta(id: string) {
-  const meta = routeMeta[id] ?? routeMeta.overview;
+  const meta = routeMeta[id] ?? routeMeta.notFound;
   document.title = `${meta.title} · Docu Web`;
   let description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
   if (!description) { description = document.createElement("meta"); description.name = "description"; document.head.appendChild(description); }
@@ -369,7 +375,7 @@ function applyRouteMeta(id: string) {
 function renderBreadcrumbs() {
   const target = document.querySelector<HTMLElement>("#breadcrumbs");
   if (!target) return;
-  const meta = routeMeta[state.active] ?? routeMeta.overview;
+  const meta = routeMeta[state.active] ?? routeMeta.notFound;
   target.innerHTML = `<a href="/" data-section="overview">Docu Web</a><span>/</span><span>${meta.group}</span><span>/</span><strong>${meta.title}</strong>`;
 }
 
@@ -403,7 +409,7 @@ function renderDocument() {
   const next = currentIndex >= 0 && currentIndex < sections.length - 1 ? sections[currentIndex + 1] : undefined;
   const pager = !query && current ? `<nav class="route-pager" aria-label="Documentation pagination"><span>${previous ? `<a href="${sectionPath(previous.id)}" data-section="${previous.id}"><small>Previous</small><strong>← ${previous.label}</strong></a>` : ""}</span><span>${next ? `<a href="${sectionPath(next.id)}" data-section="${next.id}"><small>Next</small><strong>${next.label} →</strong></a>` : ""}</span></nav>` : "";
   document.querySelector(".hero")?.classList.toggle("route-hidden", !query && state.active !== "overview");
-  target.innerHTML = visible.length ? `${visible.map((section) => sectionMarkup[section.id]).join("")}${pager}` : `<div class="empty-state"><span>NO MATCHES</span><h3>Nothing in the field guide yet.</h3><p>Try “reactive”, “routing”, or “install”.</p></div>`;
+  target.innerHTML = visible.length ? `${visible.map((section) => sectionMarkup[section.id]).join("")}${pager}` : `<div class="empty-state"><span>404 · NOT FOUND</span><h3>This chapter is not in the field guide.</h3><p>Check the URL or return to the overview to choose a documented route.</p><a class="button button-dark" href="/" data-section="overview">Back to overview ${icon("arrow")}</a></div>`;
   count.textContent = query ? `${visible.length} result${visible.length === 1 ? "" : "s"}` : "";
   target.querySelectorAll<HTMLElement>("[data-copy]").forEach((button) => button.addEventListener("click", async () => { await navigator.clipboard?.writeText(button.dataset.copy ?? ""); state.copied = true; setTimeout(() => state.copied = false, 1400); }));
 }
@@ -411,7 +417,7 @@ function renderDocument() {
 function renderToc() {
   const toc = document.querySelector("#toc-links");
   if (!toc) return;
-  const current = routeMeta[state.active] ?? routeMeta.overview;
+  const current = routeMeta[state.active] ?? routeMeta.notFound;
   toc.innerHTML = `<a class="toc-link is-active" href="${sectionPath(state.active)}" data-section="${state.active}">${current.title}</a><span class="toc-route-note">Current route</span>`;
 }
 
@@ -462,7 +468,10 @@ effect(() => {
   document.querySelectorAll<HTMLElement>("[data-version-label]").forEach((node) => { node.textContent = version; });
   const description = document.querySelector<HTMLElement>("[data-version-description]");
   if (description) description.textContent = versions[version as keyof typeof versions];
-  document.querySelector(".version-control select")?.setAttribute("value", version);
+  const policy = document.querySelector<HTMLElement>("[data-version-policy]");
+  if (policy) policy.textContent = versionPolicies[version as keyof typeof versionPolicies];
+  const versionSelect = document.querySelector<HTMLSelectElement>(".version-control select");
+  if (versionSelect && versionSelect.value !== version) versionSelect.value = version;
       document.querySelector(".sidebar")?.classList.toggle("is-open", state.mobileOpen);
       document.querySelector("[data-close-drawer]")?.classList.toggle("is-visible", state.mobileOpen);
       document.body.classList.toggle("drawer-open", state.mobileOpen);

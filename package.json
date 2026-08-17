@@ -12,9 +12,10 @@
     "check": "tsc --noEmit",
     "verify:docs": "node scripts/verify-docs.mjs",
     "verify:runtime": "node scripts/verify-runtime.mjs",
+    "verify:examples": "node scripts/verify-examples.mjs",
     "smoke": "node scripts/smoke-test.mjs",
     "test:unit": "vitest run client/tests/docs.test.mjs",
-    "test": "pnpm run verify:docs && pnpm run verify:runtime && pnpm run test:unit",
+    "test": "pnpm run verify:docs && pnpm run verify:runtime && pnpm run verify:examples && pnpm run test:unit",
     "format": "prettier --write ."
   },
   "dependencies": {

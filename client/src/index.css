@@ -102,7 +102,7 @@ pre { margin:0; padding:22px 20px 25px; overflow:auto; font:13px/1.8 'IBM Plex M
 .api-heading > div:first-child { max-width:520px; }
 .api-version-badge { min-width:145px; border-left:2px solid var(--vermilion); padding:3px 0 5px 14px; }
 .api-version-badge strong { display:block; font:22px 'DM Serif Display',serif; margin:7px 0 1px; }
-.api-version-badge small { display:block; color:var(--ink-soft); font:10px 'IBM Plex Mono',monospace; }
+.api-version-badge small { display:block; color:var(--ink-soft); font:10px 'IBM Plex Mono',monospace; }.api-version-policy { max-width:220px; margin:10px 0 0; color:var(--ink-soft); font-size:11px; line-height:1.55; }
 .api-grid { display:grid; grid-template-columns:176px minmax(0,1fr); gap:13px; margin-top:32px; }
 .api-index { border-top:1px solid var(--ink); }
 .api-index-head,.output-head { display:flex; justify-content:space-between; color:#9d9a91; padding:10px 1px; font:500 9px 'IBM Plex Mono',monospace; letter-spacing:.1em; }

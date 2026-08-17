@@ -20,6 +20,14 @@ describe("documentation release surface", () => {
     }
   });
 
+  it("keeps the selected-version policy and current route surface explicit", async () => {
+    const source = await read("client/src/main.tsx");
+    for (const marker of ["versionPolicies", "data-version-policy", "architecture", "deep-reactivity", "recipes", "migration", "performance", "troubleshooting", "notFound", "404 · NOT FOUND", "Escape", "data-close-drawer"]) {
+      expect(source).toContain(marker);
+    }
+    expect(source).not.toContain("/docs/deployment");
+  });
+
   it("keeps provider automation and security configuration present", async () => {
     const vercel = await read(".github/workflows/deploy-vercel.yml");
     const netlify = await read(".github/workflows/deploy-netlify.yml");

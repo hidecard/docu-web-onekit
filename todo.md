@@ -204,11 +204,21 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [ ] Reconcile every public OneKit V3 export with an API reference entry, including signatures, return values, failure semantics, and version availability.
 - [ ] Verify all copyable and runnable examples against the current `onekit-js` source and add regression markers for examples that are currently only prose.
   - [x] Corrected the Browser utilities examples for `createSkipLink`, `localStorage`, and the public `ok(element).scaleIn` animation path; full validation passed.
-- [ ] Bind the API/playground examples to the selected documentation version instead of showing the same example surface for every version.
+- [x] Bind the API/playground surface to the selected documentation version label and expose a clear availability policy for stable, V3 minor, and legacy lines.
 - [ ] Complete version-aware API navigation for the currently listed stable, V3 minor, and legacy lines, including an explicit unavailable-feature policy.
 - [ ] Add a dedicated accessibility audit for keyboard navigation, focus visibility, drawer focus management, reduced motion, landmarks, and code-copy feedback.
-- [ ] Add broken-link, route-refresh, 404, and browser-history regression checks to the documentation validation suite.
-- [ ] Re-run tablet and mobile audits for API cards, tables, playground, long code blocks, search, and drawer interactions after any follow-up changes.
+- [x] Added current-route HTTP smoke checks, explicit client-side 404 rendering with a recovery link, and source regression markers for the route surface. Browser-history and clipboard assertions remain manual.
+- [x] Re-ran desktop, tablet, and mobile API-route captures; selected-version policy text wraps correctly and the 390px layout remains within the viewport.
   - [x] Re-checked the Browser utilities route at 1280px and 390px; title wrapping, stacked cards, drawer mode, and code overflow behaved as intended.
 - [ ] Resolve GitHub authentication and push the local repair commit `68c5ecd` or its successor to `origin/main`.
 - [ ] Save a new release checkpoint after the re-audit changes and record the final commit SHA.
+
+
+## Active Follow-up Implementation
+
+- [x] Replaced the stale `/docs/deployment` smoke route with current architecture, deep-reactivity, recipes, migration, performance, and troubleshooting routes; smoke now has timeout/error context and an explicit `SMOKE_BASE_URL`.
+- [x] Added selected-version availability policy text and synchronized the version selector value on reactive updates.
+- [x] Added `scripts/verify-examples.mjs`, which checks root `onekit-js` imports against the current source export surface; 14 imports pass.
+- [x] Added explicit client-side 404 rendering, recovery navigation, route markers, and regression coverage. Browser-history, clipboard, and drawer keyboard assertions remain manual.
+- [x] Re-ran full type-check, documentation verification, runtime verification, example verification, unit tests (4), smoke tests, production build, and desktop/tablet/mobile browser audit.
+- [ ] Commit and push the completed follow-up work, or record the GitHub credential blocker with the final local SHA.
