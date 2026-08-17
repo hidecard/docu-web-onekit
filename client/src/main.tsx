@@ -331,6 +331,7 @@ fetch('/onekit-runtime.js').then(response=>response.text()).then(source=>{const 
 </script></body></html>`;
 
 function resetRunner(frame: HTMLIFrameElement) {
+  frame.dataset.loaded = "false";
   frame.srcdoc = runnerSrcDoc;
   frame.dataset.ready = "true";
 }
@@ -343,12 +344,20 @@ function bindUsageRunners() {
     const status = card.querySelector<HTMLElement>("[data-example-status]");
     if (!run || !reset || !frame || !status || run.dataset.bound === "true") return;
     run.dataset.bound = "true";
+    const timer = { id: 0 as number | undefined };
     const execute = (code: string) => {
       if (!frame.contentWindow) return;
+      if (timer.id) window.clearTimeout(timer.id);
       status.textContent = "RUNNING";
       frame.contentWindow.postMessage({ type: "run", code }, "*");
+      timer.id = window.setTimeout(() => {
+        status.textContent = "TIMEOUT: sandbox reset";
+        delete frame.dataset.pendingCode;
+        resetFrame();
+      }, 3000);
     };
     const resetFrame = () => {
+      if (timer.id) { window.clearTimeout(timer.id); timer.id = undefined; }
       frame.srcdoc = runnerSrcDoc;
       frame.dataset.loaded = "false";
       status.textContent = "READY";
@@ -357,10 +366,12 @@ function bindUsageRunners() {
       if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
       if (event.data.type === "ready") {
         frame.dataset.loaded = "true";
+        status.textContent = "READY";
         const pending = frame.dataset.pendingCode;
         if (pending) { delete frame.dataset.pendingCode; execute(pending); }
       }
       if (event.data.type === "complete" || event.data.type === "error") {
+        if (timer.id) { window.clearTimeout(timer.id); timer.id = undefined; }
         status.textContent = event.data.type === "error" ? `ERROR: ${event.data.text ?? "runtime failure"}` : "COMPLETE";
       }
     });
@@ -387,17 +398,38 @@ function bindLessonRunners() {
     card.appendChild(frame);
     button.dataset.bound = "true";
     const timer = { id: 0 as number | undefined };
-    frame.addEventListener("load", () => { status.textContent = "SAFE RUNTIME · READY"; }, { once: true });
+    const execute = (code: string) => {
+      if (!frame.contentWindow) return;
+      status.textContent = "RUNNING · sandboxing example…";
+      frame.contentWindow.postMessage({ type: "run", code }, "*");
+      timer.id = window.setTimeout(() => {
+        status.textContent = "TIMEOUT · example reset";
+        delete frame.dataset.pendingCode;
+        resetRunner(frame);
+      }, 1200);
+    };
+    frame.addEventListener("load", () => {
+      status.textContent = "SAFE RUNTIME · READY";
+      const pending = frame.dataset.pendingCode;
+      if (pending) { delete frame.dataset.pendingCode; execute(pending); }
+    }, { once: true });
     window.addEventListener("message", (event) => {
       if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
-      if (timer.id) window.clearTimeout(timer.id);
-      status.textContent = event.data.type === "error" ? `ERROR · ${event.data.text}` : `OUTPUT · ${event.data.text}`;
+      if (event.data.type === "ready") {
+        frame.dataset.loaded = "true";
+        status.textContent = "READY";
+        const pending = frame.dataset.pendingCode;
+        if (pending) { delete frame.dataset.pendingCode; execute(pending); }
+        return;
+      }
+      if (timer.id) { window.clearTimeout(timer.id); timer.id = undefined; }
+      status.textContent = event.data.type === "error" ? `ERROR · ${event.data.text ?? "runtime failure"}` : `OUTPUT · ${event.data.text ?? "Completed"}`;
     });
     resetRunner(frame);
     button.addEventListener("click", () => {
-      status.textContent = "RUNNING · sandboxing example…";
-      frame.contentWindow?.postMessage({ type: "run", code: decodeURIComponent(button.dataset.runCode ?? "") }, "*");
-      timer.id = window.setTimeout(() => { status.textContent = "TIMEOUT · example reset"; resetRunner(frame); }, 1200);
+      const code = decodeURIComponent(button.dataset.runCode ?? "");
+      if (frame.dataset.loaded === "true") execute(code);
+      else { frame.dataset.pendingCode = code; resetRunner(frame); }
     });
   });
 }
@@ -417,9 +449,10 @@ function bindPlayground() {
     w.__docuRunnerBound = true;
     window.addEventListener("message", (event) => {
       if (event.source !== frame.contentWindow || event.data?.source !== "docu-onekit-runner") return;
+      if (event.data.type === "ready") state.playgroundOutput = "Sandbox ready";
       if (event.data.type === "complete" || event.data.type === "error") {
         state.playgroundOutput = event.data.text;
-        if (w.__docuRunnerTimer) window.clearTimeout(w.__docuRunnerTimer);
+        if (w.__docuRunnerTimer) { window.clearTimeout(w.__docuRunnerTimer); w.__docuRunnerTimer = undefined; }
       }
     });
   }
@@ -427,7 +460,7 @@ function bindPlayground() {
     if (frame.contentWindow) {
       state.playgroundOutput = "Running in sandbox…";
       frame.contentWindow.postMessage({ type: "run", version: state.version, code: code.value }, "*");
-      w.__docuRunnerTimer = window.setTimeout(() => { state.playgroundOutput = "Execution timed out. The sandbox was reset."; resetRunner(frame); }, 900);
+      w.__docuRunnerTimer = window.setTimeout(() => { state.playgroundOutput = "Execution timed out. The sandbox was reset."; resetRunner(frame); }, 3000);
     }
   });
   reset.addEventListener("click", () => { code.value = defaultCode; state.playgroundCode = defaultCode; state.playgroundOutput = "Run the example to see OneKit react."; resetRunner(frame); });

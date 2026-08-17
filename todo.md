@@ -268,3 +268,26 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Validation passed after expansion: `tsc --noEmit`, docs verification (57 markers), accessibility markers, runtime verification (28 exports), example verification (14 imports), Vitest (4 tests), Vite production build, and `git diff --check`.
 - [x] Browser audit passed on `/docs/ssr` and `/docs/reactive` desktop routes; a 390px `/docs/reactive` capture showed wrapped heading, separated outcome chips, stacked step explanations, and no visible horizontal overflow.
 - [x] Committed and pushed the detailed course expansion and CSS refinements as `5014853` to `origin/main`.
+
+
+## Live Sandbox Verification
+
+- [ ] Inventory every copyable/runnable code block and confirm each has a stable example ID, language metadata, and run binding.
+- [ ] Test representative examples across beginner, core, data, routing, SSR, security, browser, and advanced guide routes.
+- [ ] Test successful output, reset, runtime error, thrown exception, timeout, missing runtime, and repeated-run behavior.
+- [ ] Verify iframe sandbox isolation, postMessage origin/source checks, output escaping, and no parent-page mutation.
+- [ ] Verify Copy, Live Run, Reset, keyboard access, status announcements, and mobile touch behavior.
+- [ ] Fix any runner or documentation example defects found and add regression markers/tests.
+- [ ] Re-run type-check, docs/runtime/example verification, unit tests, smoke tests, production build, and responsive browser audit.
+- [ ] Commit and push the verified Live Sandbox improvements.
+
+
+## Live Sandbox Verification Record
+
+- [x] Audited `runnerSrcDoc`, usage cards, beginner lesson runners, playground binding, message-source checks, pending execution, reset, and timeout paths.
+- [x] Fixed the lesson-runner startup race: Run now queues `frame.dataset.pendingCode` until the iframe sends the `ready` message instead of posting into an unloaded runtime.
+- [x] Added 3-second timeout/reset handling to usage-card runners and aligned playground timeout cleanup; complete/error states now clear timers and show meaningful fallback text.
+- [x] Added regression markers for pending execution, timeout reset, sandbox status, and playground timeout behavior.
+- [x] Validation passed: TypeScript, documentation/runtime/example verification, 4 unit tests, production client build, and `git diff --check`.
+- [x] Chromium production DOM smoke confirmed `Run in sandbox`, `Copy`, `data-run-code`, `lesson-frame`, and `SAFE RUNTIME` markers render on `/docs/first-app`.
+- [ ] Commit and push the verified Live Sandbox improvements.
