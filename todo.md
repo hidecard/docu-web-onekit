@@ -172,19 +172,28 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 
 ## Detailed Framework-Quality OneKit JS V3 Manual
 
-- [ ] Audit existing docs for missing beginner, core, advanced, production, API, recipe, migration, troubleshooting, and best-practice chapters.
-- [ ] Add a detailed learning path from first principles to a complete production application.
-- [ ] Expand every V3 feature guide with concepts, API signatures, complete examples, alternatives, pitfalls, and production notes.
-- [ ] Add API reference tables and real-project recipes for CRUD, auth boundaries, dashboards, forms, routing, SSR, and testing.
-- [ ] Add migration guides from React/Vue-style mental models and an explicit OneKit architecture guide.
-- [ ] Add troubleshooting, performance, accessibility, security, deployment, and testing playbooks.
-- [ ] Improve long-form docs navigation, table of contents, progress cues, code readability, search, and mobile/tablet UX.
-- [ ] Validate documented APIs/examples, links, accessibility, type-check, tests, production build, and responsive routes.
-- [ ] Commit and push the detailed manual update to `docu-web-onekit` `main`.
+- [x] Audited the existing docs and added beginner, core, advanced, production, API, recipe, migration, troubleshooting, and best-practice chapters.
+- [x] Added a detailed learning path from first principles to a complete production application.
+- [x] Expanded the V3 feature guides with concepts, API signatures, examples, alternatives, pitfalls, and production notes.
+- [x] Added API usage cards and real-project recipes for CRUD, dashboards, forms, routing, SSR, and testing.
+- [x] Added React/Vue migration guidance and an explicit OneKit architecture guide.
+- [x] Added troubleshooting, performance, accessibility, security, deployment, and testing playbooks.
+- [x] Improved long-form navigation, table of contents, progress cues, code readability, search, and mobile/tablet UX.
+- [x] Validated documented content, runtime markers, accessibility markers, type-check, unit tests, production build, and representative responsive routes.
+- [ ] Commit and push the repaired detailed manual update to `docu-web-onekit` `main`.
 
 ### Detailed manual implementation record
 
 - [x] Added architecture, deep reactivity, real-project recipes, React/Vue migration, performance, and troubleshooting chapters in `client/src/main.tsx`.
-- [x] Pushed commit `e11709a` to `main`; `origin/main` is synchronized and the working tree was clean immediately after push.
-- [x] Existing documentation markers, framework scan, prior responsive browser checks, and `git diff --check` passed.
-- [ ] Fresh full validation rerun remains to be completed separately because long-running preview/watch processes caused the combined command to time out; no failure output was produced.
+- [x] Repaired five malformed chapter-boundary template-literal escapes and the final `usageCard` boundary in `client/src/main.tsx`.
+- [x] Added mobile min-content constraints for the reading grid, document, sections, and prose while keeping code blocks horizontally scrollable.
+- [x] Fresh validation passed: `tsc --noEmit`; documentation verification (57 markers); runtime synchronization (28 exports); Vitest (1 file, 3 tests); and Vite/server production build.
+- [x] Desktop browser metrics showed no horizontal overflow at 1280px; Architecture route rendered with previous/next links and complete chapter content.
+- [x] 390px mobile Chromium render showed the mobile header/drawer mode, wrapped long headings, responsive search, and touch-friendly code surfaces after the min-content fix.
+
+## Local UI/UX Responsive Audit
+
+- [x] Started the local Vite preview on port 3004 and inspected the overview and Architecture routes.
+- [x] Verified desktop metrics at 1280px with no horizontal overflow, and captured a 390px mobile render of Deep Reactivity.
+- [x] Fixed mobile min-content overflow by constraining the reading grid, document, sections, and prose to the viewport; code blocks remain horizontally scrollable.
+- [x] Re-ran `tsc --noEmit`, `pnpm test -- --run`, and `pnpm run build`; all passed. The temporary preview process remains available on port 3004 for manual follow-up.

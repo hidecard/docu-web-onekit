@@ -37,6 +37,8 @@ button { cursor:pointer; }
 .sidebar-foot { margin-top:auto; display:flex; gap:8px; align-items:center; color:#8a8e89; font:10px 'IBM Plex Mono',monospace; }
 .status-dot { width:6px; height:6px; border-radius:50%; background:#52a66b; box-shadow:0 0 0 4px rgba(82,166,107,.12); }
 .main-column { min-width:0; }
+.document { min-width:0; }
+.doc-section { min-width:0; }
 .hero { display:grid; grid-template-columns:minmax(300px,1fr) minmax(380px,1fr); gap:5vw; align-items:center; padding:78px 6vw 88px; border-bottom:1px solid var(--line); max-width:1260px; }
 .hero-copy { max-width:510px; }
 h1,h2,h3,p { margin-top:0; }
@@ -54,7 +56,7 @@ h1 em { color:var(--vermilion); }
 .hero-illustration { display:block; width:100%; aspect-ratio:1.22; background:#f5eddf; box-shadow:var(--shadow); overflow:hidden; }
 .hero-illustration svg { display:block; width:100%; height:100%; }
 .art-caption { display:flex; justify-content:space-between; margin-top:10px; color:#8a8e89; }
-.reading-layout { display:grid; grid-template-columns:minmax(0,720px) 170px; gap:65px; padding:55px 6vw 100px; max-width:1120px; }
+.reading-layout { display:grid; grid-template-columns:minmax(0,720px) 170px; gap:65px; padding:55px 6vw 100px; max-width:1120px; min-width:0; width:100%; }
 .document-meta { display:flex; gap:25px; color:#8a8e89; border-bottom:1px solid var(--line); padding-bottom:18px; }
 .document-meta span:first-child { color:var(--vermilion); }
 .search-row { display:flex; align-items:center; gap:14px; margin:25px 0 46px; }
@@ -90,7 +92,7 @@ pre { margin:0; padding:22px 20px 25px; overflow:auto; font:13px/1.8 'IBM Plex M
 @keyframes rise { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; scroll-behavior:auto!important; transition:none!important; } }
 @media (max-width:980px) { .content-frame { grid-template-columns:220px minmax(0,1fr); }.sidebar { padding-left:25px; }.hero { grid-template-columns:1fr; padding-top:55px; }.hero-art { max-width:560px; }.reading-layout { grid-template-columns:1fr; }.toc { display:none; } }
-@media (max-width:680px) { .topbar { height:64px; padding:0 20px; }.topbar-meta { gap:12px; }.version-pill,.topbar-meta>a { display:none; }.mobile-menu { display:block; }.content-frame { display:block; }.sidebar { position:fixed; inset:64px auto 0 0; z-index:8; width:min(290px,85vw); background:var(--paper); transform:translateX(-105%); transition:transform .24s var(--ease); box-shadow:12px 0 30px rgba(23,43,53,.1); padding:35px 30px; }.sidebar.is-open { transform:translateX(0); }.sidebar-foot { margin-top:30px; }.hero { padding:45px 22px 55px; }.hero-copy { max-width:none; } h1 { font-size:60px; }.hero-lede { font-size:16px; }.hero-actions { align-items:flex-start; flex-direction:column; gap:17px; }.reading-layout { padding:38px 22px 70px; }.document-meta { gap:10px; flex-wrap:wrap; font-size:9px; }.principle-grid,.checklist { grid-template-columns:1fr; gap:20px; }.route-list>div { grid-template-columns:48px 1fr; }.route-list>div span:last-child { grid-column:2; }.footer { padding:18px 22px 25px; flex-direction:column; gap:8px; font-size:9px; } }
+@media (max-width:680px) { .reading-layout, .document, .doc-section, .manual-prose { width:100%; max-width:100%; } .topbar { height:64px; padding:0 20px; }.topbar-meta { gap:12px; }.version-pill,.topbar-meta>a { display:none; }.mobile-menu { display:block; }.content-frame { display:block; }.sidebar { position:fixed; inset:64px auto 0 0; z-index:8; width:min(290px,85vw); background:var(--paper); transform:translateX(-105%); transition:transform .24s var(--ease); box-shadow:12px 0 30px rgba(23,43,53,.1); padding:35px 30px; }.sidebar.is-open { transform:translateX(0); }.sidebar-foot { margin-top:30px; }.hero { padding:45px 22px 55px; }.hero-copy { max-width:none; } h1 { font-size:60px; }.hero-lede { font-size:16px; }.hero-actions { align-items:flex-start; flex-direction:column; gap:17px; }.reading-layout { padding:38px 22px 70px; }.document-meta { gap:10px; flex-wrap:wrap; font-size:9px; }.principle-grid,.checklist { grid-template-columns:1fr; gap:20px; }.route-list>div { grid-template-columns:48px 1fr; }.route-list>div span:last-child { grid-column:2; }.footer { padding:18px 22px 25px; flex-direction:column; gap:8px; font-size:9px; } }
 
 /* API reference + Live Playground: a compact reference desk layered into the Paper Index system. */
 .version-control { display:flex; align-items:center; gap:8px; color:#8a8e89; font:500 9px 'IBM Plex Mono',monospace; letter-spacing:.1em; }
