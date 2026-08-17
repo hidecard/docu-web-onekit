@@ -43,7 +43,23 @@ jobs:
       - name: Validate and build
         run: pnpm run check && pnpm run build:client
 
+      - name: Check Vercel credentials
+        id: credentials
+        shell: bash
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [[ -n "$VERCEL_ORG_ID" && -n "$VERCEL_PROJECT_ID" && -n "$VERCEL_TOKEN" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Vercel deployment skipped: VERCEL_ORG_ID, VERCEL_PROJECT_ID, and VERCEL_TOKEN must be configured in GitHub Actions secrets/environment." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Pull Vercel project settings
+        if: steps.credentials.outputs.configured == 'true'
         run: pnpm dlx vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token="$VERCEL_TOKEN"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -51,6 +67,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Build with Vercel
+        if: steps.credentials.outputs.configured == 'true'
         run: pnpm dlx vercel build ${{ github.event_name == 'pull_request' && '' || '--prod' }} --token="$VERCEL_TOKEN"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -58,6 +75,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel
+        if: steps.credentials.outputs.configured == 'true'
         id: deploy
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
@@ -72,8 +90,12 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
+      - name: Report skipped Vercel deployment
+        if: steps.credentials.outputs.configured != 'true'
+        run: echo "Vercel deployment was not attempted because its GitHub Actions credentials are not configured."
+
       - name: Comment preview URL
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.credentials.outputs.configured == 'true'
         uses: actions/github-script@v7
         with:
           script: |

@@ -210,8 +210,8 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Added current-route HTTP smoke checks, explicit client-side 404 rendering with a recovery link, and source regression markers for the route surface. Browser-history and clipboard assertions remain manual.
 - [x] Re-ran desktop, tablet, and mobile API-route captures; selected-version policy text wraps correctly and the 390px layout remains within the viewport.
   - [x] Re-checked the Browser utilities route at 1280px and 390px; title wrapping, stacked cards, drawer mode, and code overflow behaved as intended.
-- [ ] Resolve GitHub authentication and push the local repair commit `68c5ecd` or its successor to `origin/main`.
-- [ ] Save a new release checkpoint after the re-audit changes and record the final commit SHA.
+- [x] Resolved GitHub authentication and pushed the follow-up release commit `87482ac` to `origin/main`.
+- [x] Recorded final pushed commit SHA `87482ac`; remaining release checkpointing is handled by the repository commit/push workflow.
 
 
 ## Active Follow-up Implementation
@@ -221,4 +221,13 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Added `scripts/verify-examples.mjs`, which checks root `onekit-js` imports against the current source export surface; 14 imports pass.
 - [x] Added explicit client-side 404 rendering, recovery navigation, route markers, and regression coverage. Browser-history, clipboard, and drawer keyboard assertions remain manual.
 - [x] Re-ran full type-check, documentation verification, runtime verification, example verification, unit tests (4), smoke tests, production build, and desktop/tablet/mobile browser audit.
-- [ ] Commit and push the completed follow-up work, or record the GitHub credential blocker with the final local SHA.
+- [x] Committed and pushed the completed follow-up work as `87482ac` to `origin/main`.
+
+
+## Deployment Failure Recheck
+
+- [ ] Inspect GitHub Actions deployment workflows and current provider configuration for Netlify and Vercel.
+- [ ] Retrieve failed run logs and identify whether failures are caused by build commands, output directories, runtime configuration, or provider credentials.
+- [ ] Reproduce the deployment build locally with the same commands and verify the expected artifact paths.
+- [ ] Apply only verified deployment compatibility fixes and re-run the complete documentation validation suite.
+- [ ] Commit and push any deployment fix, then verify the resulting GitHub deployment status or record any provider-side blocker.
