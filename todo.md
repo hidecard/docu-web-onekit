@@ -245,3 +245,26 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Re-audited desktop, tablet, and mobile layouts; code blocks remain scrollable while beginner prose and controls wrap within the viewport.
 - [x] Added regression markers for the runner fixture and complete-state fallback; existing docs, runtime, example, unit, smoke, build, and whitespace checks pass.
 - [x] Committed and pushed the expanded beginner manual as `598c899` to `origin/main`.
+
+
+## Detailed Course Expansion
+
+- [ ] Audit every chapter for concept-first explanations, prerequisites, terminology, API signatures, line-by-line code notes, expected output, pitfalls, exercises, and next-step links.
+- [ ] Add a consistent beginner lesson structure to core chapters: Why it matters, mental model, minimum example, complete example, line-by-line explanation, common mistakes, exercise, and production note.
+- [ ] Expand reactive state, components, templates, events/forms, routing, data fetching, SSR, security, testing, CLI, and deployment chapters with verified V3 examples.
+- [ ] Add explicit runnable examples and expected outputs to chapters that currently contain prose-only guidance.
+- [ ] Improve code-block UI with file/language labels, line-focused notes, output interpretation, reset behavior, copy feedback, and accessible status announcements.
+- [ ] Add chapter completion/progress cues and cross-links so beginners can resume the learning path without losing context.
+- [ ] Add regression markers and validation for detailed chapter content, runnable examples, exercises, and accessibility behavior.
+- [ ] Re-run type-check, docs/runtime/example verification, unit tests, smoke tests, production build, and desktop/tablet/mobile browser audit.
+- [ ] Commit and push the detailed course expansion.
+
+
+## Detailed Course Expansion Audit Record
+
+- [x] Added step-by-step learning outcomes and sequential explanation layers to Reactive state, Components, Routing, and Production chapters.
+- [x] Added responsive outcome chips, step lists, and three-column detail panels with mobile stacking and readable wrapping.
+- [x] Preserved existing runnable cards, Copy/Live Run/Reset controls, sandbox output, route navigation, and version selector.
+- [x] Validation passed after expansion: `tsc --noEmit`, docs verification (57 markers), accessibility markers, runtime verification (28 exports), example verification (14 imports), Vitest (4 tests), Vite production build, and `git diff --check`.
+- [x] Browser audit passed on `/docs/ssr` and `/docs/reactive` desktop routes; a 390px `/docs/reactive` capture showed wrapped heading, separated outcome chips, stacked step explanations, and no visible horizontal overflow.
+- [ ] Commit and push the detailed course expansion and CSS refinements.

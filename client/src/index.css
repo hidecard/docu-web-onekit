@@ -219,3 +219,27 @@ pre { margin:0; padding:22px 20px 25px; overflow:auto; font:13px/1.8 'IBM Plex M
   .run-status { flex-basis: 100%; }
   .lesson-frame { width: calc(100% - 22px); height: 78px; margin: 0 11px 11px; }
 }
+
+
+/* Detailed course layer: every advanced guide follows Understand → Try → Checkpoint. */
+.lesson-sequence{display:flex;flex-wrap:wrap;gap:.55rem;margin:1.25rem 0 1.5rem;padding:.8rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lesson-sequence span{font:600 .68rem/1.2 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8e89;padding:.45rem .65rem;background:var(--paper-deep);border:1px solid var(--line)}
+.guide-example-label{display:flex;justify-content:space-between;gap:1rem;margin:1.2rem 0 .45rem;color:#8a8e89;font:600 .66rem/1 'IBM Plex Mono',monospace;letter-spacing:.09em;text-transform:uppercase}
+.guide-example-label span:last-child{color:var(--vermilion)}
+.guide-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin:1rem 0;padding-top:1rem;border-top:1px solid var(--line)}
+.guide-detail-grid>div{min-width:0;padding:.8rem;background:color-mix(in srgb,var(--paper-deep) 72%,transparent);border-left:2px solid var(--vermilion)}
+.detail-label{display:block;margin-bottom:.45rem;color:var(--vermilion);font:700 .64rem/1 'IBM Plex Mono',monospace;letter-spacing:.1em}
+.guide-detail-grid p{margin:0;color:var(--ink-soft);font-size:.84rem;line-height:1.65}
+.guide-detail-grid code{font-size:.78em}
+@media (max-width:760px){.lesson-sequence{gap:.35rem}.lesson-sequence span{font-size:.6rem}.guide-detail-grid{grid-template-columns:1fr}.guide-example-label{font-size:.6rem}.guide-detail-grid p{font-size:.8rem}}
+
+/* Learning outcomes: keep the verbal contract readable instead of collapsing inline text. */
+.lesson-outcomes{display:flex;align-items:center;flex-wrap:wrap;gap:.45rem;margin:1rem 0 1.2rem;padding:.75rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lesson-outcomes strong{margin-right:.2rem;color:var(--vermilion);font:700 .66rem/1.2 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.lesson-outcomes span{padding:.38rem .55rem;color:var(--ink-soft);background:var(--paper-deep);border:1px solid var(--line);font-size:.78rem;line-height:1.3}
+.step-list{display:grid;gap:.7rem;margin:1rem 0 1.25rem}
+.step-list>div{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:.75rem;align-items:start;padding:.75rem 0;border-top:1px solid var(--line)}
+.step-list>div>span{color:var(--vermilion);font:700 .7rem/1 'IBM Plex Mono',monospace}
+.step-list strong{display:block;margin-bottom:.2rem;color:var(--ink);font-size:.9rem}
+.step-list p{margin:0;color:var(--ink-soft);font-size:.82rem;line-height:1.6}
+@media (max-width:760px){.lesson-outcomes{align-items:flex-start}.lesson-outcomes strong{flex-basis:100%;margin-bottom:.1rem}.lesson-outcomes span{font-size:.72rem}.step-list>div{grid-template-columns:1.6rem minmax(0,1fr);gap:.55rem}}
