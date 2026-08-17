@@ -193,3 +193,29 @@ pre { margin:0; padding:22px 20px 25px; overflow:auto; font:13px/1.8 'IBM Plex M
 @media (prefers-reduced-motion: reduce) {
   .journey-grid a, .breadcrumbs a, .route-pager strong { transition: none; }
 }
+
+
+/* Beginner lab: make every first-run example legible, executable, and safe on touch screens. */
+.beginner-lab { margin-top: 34px; padding: 18px; border: 1px solid var(--line); background: rgba(255,253,248,.72); }
+.beginner-lab > .section-kicker { margin-bottom: 10px; }
+.beginner-lab h3 { margin: 20px 0 7px; color: var(--ink); font-size: 19px; }
+.beginner-lab p { max-width: 720px; color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+.runnable-card { min-width: 0; margin-top: 18px; border: 1px solid var(--line); background: var(--white); }
+.runnable-card-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 11px 13px; border-bottom: 1px solid var(--line); }
+.runnable-card-head strong { color: var(--ink); font-size: 13px; }
+.runnable-card-head span { color: var(--vermilion); font: 10px 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+.runnable-card > p { margin: 0; padding: 12px 13px 0; }
+.runnable-card pre { overflow-x: auto; margin: 12px 13px; padding: 14px; background: var(--ink); color: #d9e6d3; font: 11px/1.7 'IBM Plex Mono', monospace; white-space: pre; -webkit-overflow-scrolling: touch; }
+.runnable-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 0 13px 12px; }
+.runnable-actions .button { padding: 8px 11px; font-size: 10px; }
+.run-status { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; color: #63766e; font: 10px/1.5 'IBM Plex Mono', monospace; }
+.lesson-frame { display: block; width: calc(100% - 26px); height: 72px; margin: 0 13px 13px; border: 1px solid rgba(18,35,45,.16); background: #11242e; }
+@media (max-width: 680px) {
+  .beginner-lab { margin-top: 26px; padding: 13px; }
+  .runnable-card-head { display: block; }
+  .runnable-card-head span { display: block; margin-top: 6px; }
+  .runnable-card pre { margin: 10px 11px; padding: 11px; font-size: 10px; }
+  .runnable-actions { padding: 0 11px 11px; }
+  .run-status { flex-basis: 100%; }
+  .lesson-frame { width: calc(100% - 22px); height: 78px; margin: 0 11px 11px; }
+}

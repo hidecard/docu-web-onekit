@@ -226,8 +226,22 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 
 ## Deployment Failure Recheck
 
-- [ ] Inspect GitHub Actions deployment workflows and current provider configuration for Netlify and Vercel.
-- [ ] Retrieve failed run logs and identify whether failures are caused by build commands, output directories, runtime configuration, or provider credentials.
-- [ ] Reproduce the deployment build locally with the same commands and verify the expected artifact paths.
-- [ ] Apply only verified deployment compatibility fixes and re-run the complete documentation validation suite.
-- [ ] Commit and push any deployment fix, then verify the resulting GitHub deployment status or record any provider-side blocker.
+- [x] Inspected the Netlify/Vercel workflows, provider config, package scripts, and current `main` state.
+- [x] Confirmed the latest Vercel failure was caused by empty `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, and `VERCEL_TOKEN` secrets; the prior Netlify failures were from old malformed-source commits, while the latest Netlify run was green.
+- [x] Reproduced the workflow build locally with `pnpm run check`, `pnpm run build:client`, and the full documentation test suite; expected `dist/public` artifacts were produced.
+- [x] Added a Vercel credential gate that skips deployment with a clear summary instead of failing with `--token` missing-value errors; local checks and workflow formatting passed.
+- [x] Committed and pushed `6998545` to `origin/main`; the latest Netlify and Vercel workflow runs for that commit are green.
+
+
+## Beginner Manual Rebuild
+
+- [x] Audited the full route surface and added beginner coverage for prerequisites, setup, first app, templates, events/forms, first project, core concepts, production, SSR, security, testing, CLI, and migration.
+- [x] Added a sequential beginner learning path with prerequisites, outcomes, checkpoints, sidebar groups, previous/next links, and a learner-path route.
+- [x] Expanded beginner chapters with step-by-step explanations, complete examples, checkpoints, and practical guidance.
+- [x] Added a consistent runnable code-block model with language labels, copy/run/reset controls, loading/error/complete states, and iframe output panels.
+- [x] Kept execution isolated in sandboxed iframes with an allowlisted OneKit runtime surface, timeout/reset behavior, and documented browser-only execution model.
+- [x] Added the counter-to-first-project path and linked it to the existing CRUD, forms, router, dashboard, SSR, and production recipes.
+- [x] Improved sidebar, breadcrumbs, previous/next navigation, search, progress/version cues, and explicit 404 recovery.
+- [x] Re-audited desktop, tablet, and mobile layouts; code blocks remain scrollable while beginner prose and controls wrap within the viewport.
+- [x] Added regression markers for the runner fixture and complete-state fallback; existing docs, runtime, example, unit, smoke, build, and whitespace checks pass.
+- [x] Committed and pushed the expanded beginner manual as `598c899` to `origin/main`.
