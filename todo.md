@@ -197,3 +197,18 @@ The documentation site follows the selected **Paper Index** direction: Swiss edi
 - [x] Verified desktop metrics at 1280px with no horizontal overflow, and captured a 390px mobile render of Deep Reactivity.
 - [x] Fixed mobile min-content overflow by constraining the reading grid, document, sections, and prose to the viewport; code blocks remain horizontally scrollable.
 - [x] Re-ran `tsc --noEmit`, `pnpm test -- --run`, and `pnpm run build`; all passed. The temporary preview process remains available on port 3004 for manual follow-up.
+
+
+## Follow-up Manual Re-audit
+
+- [ ] Reconcile every public OneKit V3 export with an API reference entry, including signatures, return values, failure semantics, and version availability.
+- [ ] Verify all copyable and runnable examples against the current `onekit-js` source and add regression markers for examples that are currently only prose.
+  - [x] Corrected the Browser utilities examples for `createSkipLink`, `localStorage`, and the public `ok(element).scaleIn` animation path; full validation passed.
+- [ ] Bind the API/playground examples to the selected documentation version instead of showing the same example surface for every version.
+- [ ] Complete version-aware API navigation for the currently listed stable, V3 minor, and legacy lines, including an explicit unavailable-feature policy.
+- [ ] Add a dedicated accessibility audit for keyboard navigation, focus visibility, drawer focus management, reduced motion, landmarks, and code-copy feedback.
+- [ ] Add broken-link, route-refresh, 404, and browser-history regression checks to the documentation validation suite.
+- [ ] Re-run tablet and mobile audits for API cards, tables, playground, long code blocks, search, and drawer interactions after any follow-up changes.
+  - [x] Re-checked the Browser utilities route at 1280px and 390px; title wrapping, stacked cards, drawer mode, and code overflow behaved as intended.
+- [ ] Resolve GitHub authentication and push the local repair commit `68c5ecd` or its successor to `origin/main`.
+- [ ] Save a new release checkpoint after the re-audit changes and record the final commit SHA.
